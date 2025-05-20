@@ -114,7 +114,13 @@ module RubyLLM
     end
 
     def connection(config)
-      @connection ||= Connection.new(self, config)
+      # Use the HTTP-based connection for Anthropic and Bedrock
+      # and the regular connection for other providers
+      @connection ||= if self.is_a?(Providers::Anthropic) || self.is_a?(Providers::Bedrock)
+                        HttpConnection.new(self, config)
+                      else
+                        Connection.new(self, config)
+                      end
     end
 
     class << self

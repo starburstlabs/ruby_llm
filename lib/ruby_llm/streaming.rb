@@ -10,38 +10,87 @@ module RubyLLM
 
     def stream_response(connection, payload, &block)
       accumulator = StreamAccumulator.new
-
-      connection.post stream_url, payload do |req|
-        req.options.on_data = handle_stream do |chunk|
-          accumulator.add chunk
-          block.call chunk
-        end
+      
+      # Build URL
+      base_url = connection.provider.api_base(connection.config)
+      base_url = base_url.chomp('/') if base_url.end_with?('/')
+      url = stream_url.start_with?('/') ? stream_url : "/#{stream_url}"
+      full_url = "#{base_url}#{url}"
+      
+      # Prepare headers
+      headers = {}
+      headers.merge!(connection.provider.headers(connection.config)) if connection.provider.respond_to?(:headers)
+      
+      # Prepare body
+      body = payload.is_a?(Hash) ? JSON.generate(payload, ascii_only: false) : payload
+      
+      # Log request
+      RubyLLM.logger.debug "POST #{full_url}"
+      RubyLLM.logger.debug "Headers: #{redact_sensitive_headers(headers).inspect}"
+      
+      # Stream response using HTTP.rb
+      parser = EventStreamParser::Parser.new
+      buffer = String.new
+      
+      begin
+        HTTP.timeout(connection.config.request_timeout)
+            .headers(headers)
+            .post(full_url, body: body) do |response|
+              if response.status.success?
+                response.body.each do |chunk|
+                  RubyLLM.logger.debug "Received chunk: #{chunk}"
+                  
+                  if error_chunk?(chunk)
+                    handle_error_chunk(chunk)
+                  else
+                    process_sse_chunk(chunk, parser, accumulator, &block)
+                  end
+                end
+              else
+                # Handle error response
+                response.body.each do |chunk|
+                  buffer << chunk
+                end
+                
+                begin
+                  error_data = JSON.parse(buffer)
+                  error_response = OpenStruct.new(
+                    status: response.status.code,
+                    body: error_data,
+                    headers: response.headers.to_h,
+                    env: OpenStruct.new(url: full_url)
+                  )
+                  RubyLLM::ErrorHandler.parse_error(provider: connection.provider, response: error_response)
+                rescue JSON::ParserError
+                  raise RubyLLM::Error.new(nil, "Failed to parse error response: #{buffer}")
+                end
+              end
+            end
+      rescue HTTP::Error => e
+        raise RubyLLM::Error.new(nil, "HTTP request failed: #{e.message}")
       end
-
+      
       accumulator.to_message
     end
-
-    def handle_stream(&block)
-      to_json_stream do |data|
-        block.call(build_chunk(data)) if data
-      end
-    end
-
+    
     private
-
-    def to_json_stream(&block)
-      buffer = String.new
-      parser = EventStreamParser::Parser.new
-
-      proc do |chunk, _bytes, env|
-        RubyLLM.logger.debug "Received chunk: #{chunk}"
-
-        if error_chunk?(chunk)
-          handle_error_chunk(chunk, env)
-        elsif env&.status != 200
-          handle_failed_response(chunk, buffer, env)
+    
+    def process_sse_chunk(chunk, parser, accumulator, &block)
+      parser.feed(chunk) do |type, data|
+        case type.to_sym
+        when :error
+          handle_error_event(data)
         else
-          yield handle_sse(chunk, parser, env, &block)
+          unless data == '[DONE]'
+            begin
+              parsed_data = JSON.parse(data)
+              message_chunk = build_chunk(parsed_data)
+              accumulator.add(message_chunk)
+              block.call(message_chunk)
+            rescue JSON::ParserError => e
+              RubyLLM.logger.debug "Failed to parse data chunk: #{e.message}"
+            end
+          end
         end
       end
     end
@@ -50,47 +99,38 @@ module RubyLLM
       chunk.start_with?('event: error')
     end
 
-    def handle_error_chunk(chunk, env)
+    def handle_error_chunk(chunk)
       error_data = chunk.split("\n")[1].delete_prefix('data: ')
-      status, _message = parse_streaming_error(error_data)
-      error_response = env.merge(body: JSON.parse(error_data), status: status)
-      ErrorMiddleware.parse_error(provider: self, response: error_response)
-    rescue JSON::ParserError => e
-      RubyLLM.logger.debug "Failed to parse error chunk: #{e.message}"
-    end
-
-    def handle_failed_response(chunk, buffer, env)
-      buffer << chunk
-      error_data = JSON.parse(buffer)
-      error_response = env.merge(body: error_data)
-      ErrorMiddleware.parse_error(provider: self, response: error_response)
-    rescue JSON::ParserError
-      RubyLLM.logger.debug "Accumulating error chunk: #{chunk}"
-    end
-
-    def handle_sse(chunk, parser, env, &block)
-      parser.feed(chunk) do |type, data|
-        case type.to_sym
-        when :error
-          handle_error_event(data, env)
-        else
-          yield handle_data(data, &block) unless data == '[DONE]'
-        end
+      begin
+        error_json = JSON.parse(error_data)
+        raise RubyLLM::Error.new(nil, error_json['error'] || error_json['message'] || "Error in streaming response")
+      rescue JSON::ParserError => e
+        RubyLLM.logger.debug "Failed to parse error chunk: #{e.message}"
+        raise RubyLLM::Error.new(nil, "Error in streaming response: #{chunk}")
       end
     end
 
-    def handle_data(data)
-      JSON.parse(data)
-    rescue JSON::ParserError => e
-      RubyLLM.logger.debug "Failed to parse data chunk: #{e.message}"
+    def handle_error_event(data)
+      begin
+        error_json = JSON.parse(data)
+        error_message = error_json['error'] || error_json['message'] || "Error in streaming response"
+        raise RubyLLM::Error.new(nil, error_message)
+      rescue JSON::ParserError => e
+        RubyLLM.logger.debug "Failed to parse error event: #{e.message}"
+        raise RubyLLM::Error.new(nil, "Error in streaming event: #{data}")
+      end
     end
-
-    def handle_error_event(data, env)
-      status, _message = parse_streaming_error(data)
-      error_response = env.merge(body: JSON.parse(data), status: status)
-      ErrorMiddleware.parse_error(provider: self, response: error_response)
-    rescue JSON::ParserError => e
-      RubyLLM.logger.debug "Failed to parse error event: #{e.message}"
+    
+    def redact_sensitive_headers(headers)
+      redacted = headers.dup
+      %w[Authorization authentication api_key apikey token].each do |sensitive_key|
+        redacted.keys.each do |header_key|
+          if header_key.to_s.downcase.include?(sensitive_key.downcase)
+            redacted[header_key] = "[REDACTED]"
+          end
+        end
+      end
+      redacted
     end
   end
 end

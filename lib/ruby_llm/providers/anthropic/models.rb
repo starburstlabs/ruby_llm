@@ -12,7 +12,13 @@ module RubyLLM
         end
 
         def parse_list_models_response(response, slug, capabilities)
-          Array(response.body['data']).map do |model_data|
+          # Special handling for HTTP.rb responses
+          data = if response.is_a?(HTTP::Response)
+                   JSON.parse(response.body.to_s)
+                 else
+                   response.body
+                 end
+          Array(data['data']).map do |model_data|
             model_id = model_data['id']
 
             ModelInfo.new(

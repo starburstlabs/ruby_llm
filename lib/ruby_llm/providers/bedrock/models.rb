@@ -24,7 +24,13 @@ module RubyLLM
         end
 
         def parse_list_models_response(response, slug, capabilities)
-          models = Array(response.body['modelSummaries'])
+          # Special handling for HTTP.rb responses
+          data = if response.is_a?(HTTP::Response)
+                   JSON.parse(response.body.to_s)
+                 else
+                   response.body
+                 end
+          models = Array(data['modelSummaries'])
 
           # Filter to include only models we care about
           models.select { |m| m['modelId'].include?('claude') }.map do |model_data|

@@ -61,8 +61,8 @@ module RubyLLM
 
       def fetch_content
         RubyLLM.logger.debug("Fetching content from URL: #{@source}")
-        response = Faraday.get(@source)
-        @content = response.body if response.success?
+        response = HTTP.follow.get(@source)
+        @content = response.body.to_s if response.status.success?
       end
 
       def load_content_from_path

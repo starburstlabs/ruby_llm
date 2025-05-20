@@ -2,8 +2,7 @@
 
 require 'base64'
 require 'event_stream_parser'
-require 'faraday'
-# require 'faraday/retry'
+require 'http'
 require 'json'
 require 'logger'
 require 'securerandom'

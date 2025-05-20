@@ -36,9 +36,10 @@ Gem::Specification.new do |spec|
   # Runtime dependencies
   spec.add_dependency 'base64'
   spec.add_dependency 'event_stream_parser', '~> 1'
-  spec.add_dependency 'faraday'
+  spec.add_dependency 'faraday', '< 2.0'  # For compatibility with faraday-retry
   spec.add_dependency 'faraday-multipart', '~> 1'
-  spec.add_dependency 'faraday-net_http', '~> 3'
-  spec.add_dependency 'faraday-retry'
+  spec.add_dependency 'faraday-net_http', '~> 1'
+  spec.add_dependency 'faraday-retry', '~> 1.0'
+  spec.add_dependency 'http', '~> 5.1.1'  # For Anthropic and Bedrock providers
   spec.add_dependency 'zeitwerk', '~> 2'
 end

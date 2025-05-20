@@ -51,7 +51,36 @@ module RubyLLM
         end
 
         def parse_completion_response(response)
-          data = response.body
+          # Special handling for HTTP.rb responses
+          RubyLLM.logger.debug("Response type: #{response.class}")
+          if response.is_a?(HTTP::Response)
+            response_body = response.body.to_s
+            RubyLLM.logger.debug("HTTP::Response body: #{response_body[0..200]}")
+          elsif response.respond_to?(:body) && response.body.is_a?(Hash)
+            # Body is already a hash (parsed JSON)
+            data = response.body
+            RubyLLM.logger.debug("Response body is already a hash")
+          elsif response.respond_to?(:body)
+            response_body = response.body.to_s
+            RubyLLM.logger.debug("Response body: #{response_body[0..200]}")
+          else
+            raise "Unexpected response type: #{response.class}"
+          end
+
+          # Parse JSON if needed
+          data = if defined?(response_body) && response_body
+                   begin
+                     JSON.parse(response_body)
+                   rescue JSON::ParserError => e
+                     RubyLLM.logger.error("Failed to parse response JSON: #{e.message}")
+                     RubyLLM.logger.debug("Response body: #{response_body ? response_body[0..500] : 'nil'}")
+                     raise RubyLLM::Error.new(nil, "Failed to parse response JSON: #{e.message}")
+                   end
+                 else
+                   # If we don't have a response_body, we should already have data from a pre-parsed body
+                   data || {}
+                 end
+                 
           content_blocks = data['content'] || []
 
           text_content = extract_text_content(content_blocks)
@@ -61,6 +90,7 @@ module RubyLLM
         end
 
         def extract_text_content(blocks)
+          return "" if blocks.is_a?(String)
           text_blocks = blocks.select { |c| c['type'] == 'text' }
           text_blocks.map { |c| c['text'] }.join
         end

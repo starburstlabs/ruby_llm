@@ -23,9 +23,18 @@ module RubyLLM
       end
 
       def parse_error(response)
-        return if response.body.empty?
-
-        body = try_parse_json(response.body)
+        # Special handling for HTTP.rb responses
+        if response.is_a?(HTTP::Response)
+          response_body = response.body.to_s
+        elsif response.respond_to?(:body)
+          response_body = response.body
+        else
+          response_body = ''
+        end
+        
+        return if response_body.to_s.empty?
+        
+        body = try_parse_json(response_body)
         case body
         when Hash
           body['message']

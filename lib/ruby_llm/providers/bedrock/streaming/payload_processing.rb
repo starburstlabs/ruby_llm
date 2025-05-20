@@ -21,7 +21,9 @@ module RubyLLM
         #   end
         module PayloadProcessing
           def process_payload(payload, &)
+            RubyLLM.logger.debug("Processing payload: #{payload[0..100]}...")
             json_payload = extract_json_payload(payload)
+            RubyLLM.logger.debug("Extracted JSON payload: #{json_payload[0..100]}...")
             parse_and_process_json(json_payload, &)
           rescue JSON::ParserError => e
             log_json_parse_error(e, json_payload)
@@ -50,8 +52,12 @@ module RubyLLM
           end
 
           def decode_and_parse_data(json_data)
+            RubyLLM.logger.debug("Decoding bytes: #{json_data['bytes'][0..30]}...")
             decoded_bytes = Base64.strict_decode64(json_data['bytes'])
-            JSON.parse(decoded_bytes)
+            RubyLLM.logger.debug("Decoded bytes (first 100 chars): #{decoded_bytes[0..100]}")
+            parsed_data = JSON.parse(decoded_bytes)
+            RubyLLM.logger.debug("Parsed data keys: #{parsed_data.keys.join(', ')}")
+            parsed_data
           end
 
           def create_and_yield_chunk(data, &block)

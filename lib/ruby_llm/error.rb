@@ -15,7 +15,19 @@ module RubyLLM
 
     def initialize(response = nil, message = nil)
       @response = response
-      super(message || response&.body)
+      super(message || extract_body(response))
+    end
+
+    private
+
+    def extract_body(response)
+      return nil unless response
+      
+      if response.respond_to?(:body) 
+        response.body
+      elsif response.is_a?(Hash) && response[:body]
+        response[:body]
+      end
     end
   end
 
@@ -35,50 +47,48 @@ module RubyLLM
   class ServiceUnavailableError < Error; end
   class UnauthorizedError < Error; end
 
-  # Faraday middleware that maps provider-specific API errors to RubyLLM errors.
-  # Uses provider's parse_error method to extract meaningful error messages.
-  class ErrorMiddleware < Faraday::Middleware
-    def initialize(app, options, provider: nil)
-      super(app)
-      @provider = provider || options[:provider]
-    end
+  # Error handler module to be used with HTTP responses
+  module ErrorHandler
+    def self.parse_error(provider:, response:)
+      message = provider&.parse_error(response)
 
-    def call(env)
-      @app.call(env).on_complete do |response|
-        self.class.parse_error(provider: @provider, response: response)
-      end
-    end
+      # Determine the status code based on the response type
+      status = if response.respond_to?(:status) && response.status.respond_to?(:code)
+                # HTTP.rb response
+                response.status.code
+              elsif response.respond_to?(:status)
+                # Faraday response
+                response.status
+              elsif response.respond_to?(:code)
+                # HTTParty or Net::HTTP response
+                response.code.to_i
+              else
+                response[:status]
+              end
 
-    class << self
-      def parse_error(provider:, response:) # rubocop:disable Metrics/PerceivedComplexity
-        message = provider&.parse_error(response)
-
-        case response.status
-        when 200..399
-          message
-        when 400
-          raise BadRequestError.new(response, message || 'Invalid request - please check your input')
-        when 401
-          raise UnauthorizedError.new(response, message || 'Invalid API key - check your credentials')
-        when 402
-          raise PaymentRequiredError.new(response, message || 'Payment required - please top up your account')
-        when 403
-          raise ForbiddenError.new(response,
-                                   message || 'Forbidden - you do not have permission to access this resource')
-        when 429
-          raise RateLimitError.new(response, message || 'Rate limit exceeded - please wait a moment')
-        when 500
-          raise ServerError.new(response, message || 'API server error - please try again')
-        when 502..503
-          raise ServiceUnavailableError.new(response, message || 'API server unavailable - please try again later')
-        when 529
-          raise OverloadedError.new(response, message || 'Service overloaded - please try again later')
-        else
-          raise Error.new(response, message || 'An unknown error occurred')
-        end
+      case status
+      when 200..399
+        message
+      when 400
+        raise BadRequestError.new(response, message || 'Invalid request - please check your input')
+      when 401
+        raise UnauthorizedError.new(response, message || 'Invalid API key - check your credentials')
+      when 402
+        raise PaymentRequiredError.new(response, message || 'Payment required - please top up your account')
+      when 403
+        raise ForbiddenError.new(response,
+                                 message || 'Forbidden - you do not have permission to access this resource')
+      when 429
+        raise RateLimitError.new(response, message || 'Rate limit exceeded - please wait a moment')
+      when 500
+        raise ServerError.new(response, message || 'API server error - please try again')
+      when 502..503
+        raise ServiceUnavailableError.new(response, message || 'API server unavailable - please try again later')
+      when 529
+        raise OverloadedError.new(response, message || 'Service overloaded - please try again later')
+      else
+        raise Error.new(response, message || 'An unknown error occurred')
       end
     end
   end
 end
-
-Faraday::Middleware.register_middleware(llm_errors: RubyLLM::ErrorMiddleware)
