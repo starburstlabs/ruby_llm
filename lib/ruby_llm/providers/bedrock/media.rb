@@ -9,6 +9,9 @@ module RubyLLM
 
         module_function
 
+        # Format content for the Bedrock API (images, PDFs, etc.)
+        # @param content [String, RubyLLM::Content] The content to format
+        # @return [Array<Hash>, String] Formatted content for the API
         def format_content(content)
           return [Anthropic::Media.format_text(content)] unless content.is_a?(Content)
 
@@ -21,14 +24,25 @@ module RubyLLM
               parts << format_image(attachment)
             when Attachments::PDF
               parts << format_pdf(attachment)
+            when Attachments::Audio
+              raise Error::UnsupportedFeatureError.new(
+                provider: 'bedrock',
+                message: "Audio attachments are not currently supported with Bedrock"
+              )
             else
-              raise "Unsupported attachment type: #{attachment.class}"
+              raise Error::UnsupportedFeatureError.new(
+                provider: 'bedrock',
+                message: "Unsupported attachment type: #{attachment.class}"
+              )
             end
           end
 
           parts
         end
 
+        # Format an image for the Bedrock API
+        # @param image [RubyLLM::Attachments::Image] The image to format
+        # @return [Hash] Formatted image data for the API
         def format_image(image)
           {
             type: 'image',
@@ -40,6 +54,9 @@ module RubyLLM
           }
         end
 
+        # Format a PDF for the Bedrock API
+        # @param pdf [RubyLLM::Attachments::PDF] The PDF to format
+        # @return [Hash] Formatted PDF data for the API
         def format_pdf(pdf)
           {
             type: 'document',

@@ -9,6 +9,8 @@ module RubyLLM
     module_function
 
     def stream_response(connection, payload, &block)
+      # Default implementation for providers that don't implement specialized streaming
+      # Individual providers can override this with their own implementation
       accumulator = StreamAccumulator.new
 
       connection.post stream_url, payload do |req|

@@ -34,11 +34,13 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   # Runtime dependencies
+  spec.add_dependency 'aws-sdk-bedrock', '~> 1.0'
+  spec.add_dependency 'aws-sdk-bedrockruntime', '~> 1.0'
   spec.add_dependency 'base64'
   spec.add_dependency 'event_stream_parser', '~> 1'
   spec.add_dependency 'faraday'
   spec.add_dependency 'faraday-multipart', '~> 1'
-  spec.add_dependency 'faraday-net_http', '~> 3'
+  spec.add_dependency 'faraday-net_http', '~> 1.0'  # Downgraded to resolve conflict
   spec.add_dependency 'faraday-retry'
   spec.add_dependency 'zeitwerk', '~> 2'
 end

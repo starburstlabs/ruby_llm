@@ -51,7 +51,10 @@ module RubyLLM
         end
 
         def parse_completion_response(response)
-          data = response.body
+          parse_completion_response_body(response.body)
+        end
+
+        def parse_completion_response_body(data)
           content_blocks = data['content'] || []
 
           text_content = extract_text_content(content_blocks)
