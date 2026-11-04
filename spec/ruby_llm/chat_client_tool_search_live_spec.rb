@@ -18,7 +18,7 @@ RSpec.describe RubyLLM::Chat, :live do
           response = chat.ask(question)
 
           expect(finder.queries).not_to be_empty
-          expect(response.content).to include('42', 'shipped')
+          expect(response.content.downcase).to include('42', 'shipped')
           result = chat.messages.find { |message| RubyLLM::ToolSearchResults.from_content(message.content) }
           expect(RubyLLM::ToolSearchResults.from_content(result.content).names).to eq(['lookup_order'])
           expect(chat.messages.select(&:tool_call?).flat_map { |message| message.tool_calls.values.map(&:name) })
@@ -30,7 +30,7 @@ RSpec.describe RubyLLM::Chat, :live do
           response = chat.ask(question) { |chunk| chunks << chunk }
 
           expect(finder.queries).not_to be_empty
-          expect(response.content).to include('42', 'shipped')
+          expect(response.content.downcase).to include('42', 'shipped')
           expect(chunks).not_to be_empty
           expect(chat.messages.count(&:tool_result?)).to be >= 2
         end

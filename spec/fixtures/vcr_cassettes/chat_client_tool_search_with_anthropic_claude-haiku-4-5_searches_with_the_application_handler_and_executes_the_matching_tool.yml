@@ -1,0 +1,280 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-haiku-4-5-20251001","messages":[{"role":"user","content":[{"type":"text","text":"First
+        search for an order lookup tool, then use it to check order 42. What is its
+        status?"}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"find_tools","description":"Finds
+        tools for a task","input_schema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"name":"lookup_order","description":"Looks
+        up an order","input_schema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"defer_loading":true}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 04 Nov 2026 00:37:52 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '10000000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '10000000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2026-11-04T00:37:52Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '2000000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '2000000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2026-11-04T00:37:52Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '20000'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '19999'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2026-11-04T00:37:51Z'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '12000000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '12000000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2026-11-04T00:37:52Z'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Request-Id:
+      - "<REQUEST_ID>"
+      Traceresponse:
+      - 00-2cc91d574201a0a5ef2f1103cf21979f-57a28cff241b6975-01
+      Anthropic-Organization-Id:
+      - "<ANTHROPIC_ORGANIZATION_ID>"
+      Anthropic-Workspace-Id:
+      - "<ANTHROPIC_WORKSPACE_ID>"
+      Vary:
+      - Accept-Encoding
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Server:
+      - cloudflare
+      Server-Timing:
+      - x-originResponse;dur=1028
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-haiku-4-5-20251001","id":"msg_011CggxGjHY7qiFGGWcxv3rW","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        help you find an order lookup tool and then check the status of order 42."},{"type":"tool_use","id":"toolu_019rjo2WBYfSH2uRsAWApcfT","name":"find_tools","input":{"query":"order
+        lookup tool"},"caller":{"type":"direct"}}],"container":null,"stop_reason":"tool_use","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":591,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":75,"service_tier":"standard","inference_geo":"not_available","speed":"standard"},"diagnostics":null}'
+  recorded_at: Wed, 04 Nov 2026 00:37:52 GMT
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-haiku-4-5-20251001","messages":[{"role":"user","content":[{"type":"text","text":"First
+        search for an order lookup tool, then use it to check order 42. What is its
+        status?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll help
+        you find an order lookup tool and then check the status of order 42."},{"type":"tool_use","id":"toolu_019rjo2WBYfSH2uRsAWApcfT","name":"find_tools","input":{"query":"order
+        lookup tool"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_019rjo2WBYfSH2uRsAWApcfT","content":[{"type":"tool_reference","tool_name":"lookup_order"}]}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"find_tools","description":"Finds
+        tools for a task","input_schema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"name":"lookup_order","description":"Looks
+        up an order","input_schema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"defer_loading":true}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 04 Nov 2026 00:37:53 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '10000000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '9999000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2026-11-04T00:37:53Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '2000000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '2000000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2026-11-04T00:37:53Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '20000'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '19999'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2026-11-04T00:37:53Z'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '12000000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '11999000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2026-11-04T00:37:53Z'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Request-Id:
+      - "<REQUEST_ID>"
+      Traceresponse:
+      - 00-92150fedde099a9aef80baaf343c5045-a0081aac3255af8a-01
+      Anthropic-Organization-Id:
+      - "<ANTHROPIC_ORGANIZATION_ID>"
+      Anthropic-Workspace-Id:
+      - "<ANTHROPIC_WORKSPACE_ID>"
+      Vary:
+      - Accept-Encoding
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Server:
+      - cloudflare
+      Server-Timing:
+      - x-originResponse;dur=858
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-haiku-4-5-20251001","id":"msg_011CggxGp5ky9SJXppDF66q4","type":"message","role":"assistant","content":[{"type":"text","text":"Great!
+        I found the order lookup tool. Now let me use it to check the status of order
+        42."},{"type":"tool_use","id":"toolu_01HPphxpvPjG6p94phSSY1F5","name":"lookup_order","input":{"order_id":"42"},"caller":{"type":"direct"}}],"container":null,"stop_reason":"tool_use","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":756,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":79,"service_tier":"standard","inference_geo":"not_available","speed":"standard"},"diagnostics":null}'
+  recorded_at: Wed, 04 Nov 2026 00:37:53 GMT
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-haiku-4-5-20251001","messages":[{"role":"user","content":[{"type":"text","text":"First
+        search for an order lookup tool, then use it to check order 42. What is its
+        status?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll help
+        you find an order lookup tool and then check the status of order 42."},{"type":"tool_use","id":"toolu_019rjo2WBYfSH2uRsAWApcfT","name":"find_tools","input":{"query":"order
+        lookup tool"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_019rjo2WBYfSH2uRsAWApcfT","content":[{"type":"tool_reference","tool_name":"lookup_order"}]}]},{"role":"assistant","content":[{"type":"text","text":"Great!
+        I found the order lookup tool. Now let me use it to check the status of order
+        42."},{"type":"tool_use","id":"toolu_01HPphxpvPjG6p94phSSY1F5","name":"lookup_order","input":{"order_id":"42"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01HPphxpvPjG6p94phSSY1F5","content":[{"type":"text","text":"Order
+        42 shipped"}]}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"find_tools","description":"Finds
+        tools for a task","input_schema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"name":"lookup_order","description":"Looks
+        up an order","input_schema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"defer_loading":true}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 04 Nov 2026 00:37:54 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '10000000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '9999000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2026-11-04T00:37:54Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '2000000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '2000000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2026-11-04T00:37:54Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '20000'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '19999'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2026-11-04T00:37:54Z'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '12000000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '11999000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2026-11-04T00:37:54Z'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Request-Id:
+      - "<REQUEST_ID>"
+      Traceresponse:
+      - 00-bc28001acafbd4b00d27cfd832f32c58-4a489657cd961325-01
+      Anthropic-Organization-Id:
+      - "<ANTHROPIC_ORGANIZATION_ID>"
+      Anthropic-Workspace-Id:
+      - "<ANTHROPIC_WORKSPACE_ID>"
+      Vary:
+      - Accept-Encoding
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Server:
+      - cloudflare
+      Server-Timing:
+      - x-originResponse;dur=561
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-haiku-4-5-20251001","id":"msg_011CggxGtvipxAa4F9T64Jnp","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        status of order 42 is **shipped**. The order has been dispatched and is on
+        its way."}],"container":null,"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":852,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":27,"service_tier":"standard","inference_geo":"not_available","speed":"standard"},"diagnostics":null}'
+  recorded_at: Wed, 04 Nov 2026 00:37:54 GMT
+recorded_with: VCR 6.4.1
