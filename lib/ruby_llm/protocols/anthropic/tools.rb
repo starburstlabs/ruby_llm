@@ -38,6 +38,9 @@ module RubyLLM
         end
 
         def format_tool_result_content(msg)
+          tool_results = RubyLLM::ToolSearchResults.from_content(msg.content)
+          return format_tool_search_results(tool_results) if tool_results
+
           search_results = RubyLLM::SearchResults.from_content(msg.content)
           return search_results.results.map { |result| search_result_block(result) } if search_results
 
@@ -46,6 +49,13 @@ module RubyLLM
           content = '(no output)' if content.nil? && msg.attachments.empty?
 
           Media.format_content(content, msg.attachments)
+        end
+
+        def format_tool_search_results(results)
+          tools = RubyLLM::Tools::Search.replay(results, @search_tools || {})
+          return [{ type: 'text', text: 'No matching tools found.' }] if tools.empty?
+
+          tools.map { |tool| { type: 'tool_reference', tool_name: tool.name } }
         end
 
         def search_result_block(result)
@@ -83,7 +93,7 @@ module RubyLLM
         def apply_tool_search(payload)
           tools = Array(payload[:tools])
           return payload if tools.any? { |tool| search_tool?(tool) }
-          return payload.merge(tools: tools + [NATIVE_TOOL_SEARCH.dup]) if defers_loading?(tools)
+          return payload.merge(tools: tools + [NATIVE_TOOL_SEARCH.dup]) if !@search_tool && defers_loading?(tools)
 
           payload.merge(messages: without_tool_search_blocks(payload[:messages]))
         end

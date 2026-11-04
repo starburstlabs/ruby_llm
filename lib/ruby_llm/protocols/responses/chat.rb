@@ -18,6 +18,8 @@ module RubyLLM
         def render_payload(messages, tools:, temperature:, model:, stream: false, max_output_tokens: nil, schema: nil,
                            thinking: nil, citations: false, caching: nil, tool_prefs: nil)
           warn_unsupported_citations(model) if citations && !model.supports?(:citations)
+          @search_tools = tools
+          @search_tool = RubyLLM::Tools::Search.handler(tools)
           tool_prefs ||= {}
           # store: false leaves the provider holding no state, so reasoning has
           # to ride back in the response. xAI only encrypts it when asked.
@@ -34,7 +36,7 @@ module RubyLLM
           payload[:max_output_tokens] = max_output_tokens unless max_output_tokens.nil?
 
           if tools.any?
-            payload[:tools] = tools.map { |_, tool| tool_for(tool) }
+            payload[:tools] = render_tool_definitions(tools)
             payload[:tool_choice] = build_tool_choice(tool_prefs[:choice]) unless tool_prefs[:choice].nil?
             payload[:parallel_tool_calls] = tool_prefs[:calls] == :many unless tool_prefs[:calls].nil?
           end
@@ -47,6 +49,10 @@ module RubyLLM
           payload.merge!(prompt_cache_params(caching)) if caching
 
           payload
+        end
+
+        def render_tool_definitions(tools)
+          tools.values.map { |tool| tool_for(tool) }
         end
 
         def parse_completion_body(data, raw:)
@@ -110,7 +116,7 @@ module RubyLLM
         PORTABLE_OUTPUT_ITEM_TYPES = (%w[message function_call] + TOOL_SEARCH_ITEM_TYPES).freeze
 
         def keep_raw_output?(output, server_tool_calls)
-          server_tool_calls.any? || output.any? { |item| namespaced_call?(item) }
+          server_tool_calls.any? || output.any? { |item| namespaced_call?(item) || client_search_call?(item) }
         end
 
         def namespaced_call?(item)
@@ -130,7 +136,10 @@ module RubyLLM
         # provider-executed tool steps (web_search_call, code_interpreter_call,
         # and whatever OpenAI ships next). They are kept raw and replayed.
         def parse_server_tool_items(output)
-          output.reject { |item| CLIENT_OUTPUT_ITEM_TYPES.include?(item['type']) }.map do |item|
+          server_items = output.reject do |item|
+            CLIENT_OUTPUT_ITEM_TYPES.include?(item['type']) || client_search_call?(item)
+          end
+          server_items.map do |item|
             ServerToolCall.new(
               type: item['type'],
               name: item['name'],
@@ -299,6 +308,7 @@ module RubyLLM
         end
 
         def format_input(messages, caching: nil)
+          @client_search_call_ids = []
           system, conversation = messages.partition { |msg| msg.role == :system }
           system_items = if system_input_items?(system, caching:)
                            system.flat_map { |msg| [format_item(msg, caching:)].flatten(1) }
@@ -313,6 +323,7 @@ module RubyLLM
           messages.each_with_object([]) do |message, input|
             raw = message.raw_content
             if raw.is_a?(Hash) && raw['object'] == 'response.compaction'
+              @client_search_call_ids = []
               input.replace(raw.fetch('output'))
             else
               input.concat([format_item(message, caching:)].flatten(1))
@@ -363,11 +374,11 @@ module RubyLLM
         def format_tool_items(msg)
           return msg.raw_content if msg.raw_content
 
-          items = [{
-            type: 'function_call_output',
-            call_id: msg.tool_call_id,
-            output: format_content(msg.content)
-          }]
+          items = if (@client_search_call_ids || []).include?(msg.tool_call_id)
+                    format_tool_search_items(msg)
+                  else
+                    [{ type: 'function_call_output', call_id: msg.tool_call_id, output: format_content(msg.content) }]
+                  end
 
           if msg.attachments.any?
             parts = [{ type: 'input_text', text: "Attachments from tool call #{msg.tool_call_id}:" }]
@@ -378,16 +389,49 @@ module RubyLLM
           items
         end
 
+        def format_tool_search_items(msg)
+          results = RubyLLM::ToolSearchResults.from_content(msg.content)
+          tools = results ? RubyLLM::Tools::Search.replay(results, @search_tools || {}) : []
+          items = [{ type: 'tool_search_output', execution: 'client', call_id: msg.tool_call_id, status: 'completed',
+                     tools: tools.map { |tool| tool_for(tool) } }]
+          unless results
+            text = msg.content.to_s
+            text = '(no output)' if text.empty?
+            items << { role: 'user', content: [{ type: 'input_text', text: }] }
+          end
+          items
+        end
+
         def format_assistant_items(msg)
           # Turns that used server tools replay their output items verbatim,
           # reasoning and tool results included, as stateless chaining expects.
-          return msg.raw_content if msg.raw_content
+          return format_raw_assistant_items(msg) if msg.raw_content
 
           items = []
           items << format_reasoning_item(msg.thinking) if own_signature(msg)
           items << { role: 'assistant', content: format_output_content(msg) } unless empty_content?(msg.content)
           items.concat(format_function_call_items(msg.tool_calls)) if msg.tool_call?
           items
+        end
+
+        def format_raw_assistant_items(msg)
+          return format_ordinary_search_history(msg) unless @search_tool
+
+          msg.raw_content.each do |item|
+            (@client_search_call_ids ||= []) << item.fetch('call_id') if client_search_call?(item)
+          end
+        end
+
+        def format_ordinary_search_history(msg)
+          return msg.raw_content unless msg.raw_content.any? { |item| client_search_call?(item) }
+
+          msg.raw_content.filter_map do |item|
+            next if item['type'] == 'reasoning'
+            next item unless client_search_call?(item)
+
+            call = msg.tool_calls.fetch(item.fetch('call_id'))
+            format_function_call_items(call.id => call).first
+          end
         end
 
         def format_reasoning_item(thinking)
@@ -439,6 +483,40 @@ module RubyLLM
         def parse_finish_reason(data)
           reason = data.dig('incomplete_details', 'reason') || (data['status'] if data['status'] == 'completed')
           normalize_finish_reason(reason)
+        end
+
+        def client_search_call?(item)
+          item['type'] == 'tool_search_call' && item['execution'] == 'client'
+        end
+
+        def parse_client_search_calls(output, response: nil, finish_reason: nil)
+          call_ids = output.filter_map { |item| pending_call_id(item) }
+          output.select { |item| client_search_call?(item) }.to_h do |item|
+            id = item['call_id']
+            unless @search_tool
+              raise ToolCallParseError.new('Client tool search requires a tool declaring searches_tools',
+                                           response:, finish_reason:)
+            end
+            unless unique_tool_call_id?(id, call_ids) && item['arguments'].is_a?(Hash)
+              raise ToolCallParseError.new('Provider returned a client tool search call with invalid ID or arguments',
+                                           response:, finish_reason:)
+            end
+
+            call = ToolCall.new(id: item['call_id'], name: @search_tool.name, arguments: item['arguments'])
+            [call.id, call]
+          end
+        end
+
+        def unique_tool_call_id?(id, call_ids)
+          id.is_a?(String) && !id.empty? && call_ids.count(id) == 1
+        end
+
+        def pending_call_id(item)
+          case item['type']
+          when 'function_call' then item['call_id']
+          when 'mcp_approval_request' then item['id']
+          when 'tool_search_call' then item['call_id'] if client_search_call?(item)
+          end
         end
 
         def parse_function_calls(output, response: nil, finish_reason: nil)

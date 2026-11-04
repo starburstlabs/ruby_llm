@@ -92,7 +92,8 @@ module RubyLLM
           server_tool_calls = parse_server_tool_items(output)
 
           chunk model: response['model'],
-                tool_calls: parse_tool_approvals(output, finish_reason: parse_finish_reason(response)),
+                tool_calls: parse_tool_approvals(output, finish_reason: parse_finish_reason(response))
+                            .merge(parse_client_search_calls(output, finish_reason: parse_finish_reason(response))),
                 finish_reason: parse_finish_reason(response),
                 citations: parse_citations(response, output, nil),
                 server_tool_calls: server_tool_calls,

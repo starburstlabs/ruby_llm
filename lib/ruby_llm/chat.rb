@@ -497,7 +497,8 @@ module RubyLLM
     end
 
     # Returns the tools whose definitions stay out of the model's context
-    # until the provider's tool search loads them, as a Hash like #tools.
+    # until tool search loads them, as a Hash like #tools. Tools declaring
+    # Tool.searches_tools are always eager, including with +defer: true+.
     # Providers without tool search receive them as ordinary tools.
     #
     #   chat.with_tools(Weather).with_mcp(GitHub, defer: true)
@@ -1570,7 +1571,6 @@ module RubyLLM
     def deny_tool_calls(tool_calls)
       tool_calls.each_value do |tool_call|
         raise_if_cancelled!
-        run_callbacks(:before_message)
         add_tool_result_message(tool_call, { error: "The user denied the #{tool_call.name} tool call." })
       end
     end
@@ -1603,7 +1603,6 @@ module RubyLLM
         result = execute_tool_with_callbacks(tool_call)
         next if result.equal?(PAUSED)
 
-        run_callbacks(:before_message)
         add_tool_result_message(tool_call, result)
       end
     end
@@ -1613,7 +1612,6 @@ module RubyLLM
         next if result.equal?(PAUSED)
 
         raise_if_cancelled!
-        run_callbacks(:before_message)
         add_tool_result_message(tool_call, result)
       end
     end
@@ -1636,6 +1634,8 @@ module RubyLLM
     end
 
     def add_tool_result_message(tool_call, result)
+      Tools::Search.validate(result, producer: tools[tool_call.name.to_sym], tools:) if result.is_a?(ToolSearchResults)
+      run_callbacks(:before_message)
       content, attachments = Tool.split_result(result)
       mcp_result = result if result.is_a?(MCP::Result) && result.ui_uri
       message = add_message(role: :tool, content:, attachments:, tool_call_id: tool_call.id, mcp_result:)

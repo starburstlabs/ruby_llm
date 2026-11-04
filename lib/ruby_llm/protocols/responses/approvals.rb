@@ -24,6 +24,7 @@ module RubyLLM
         def parse_pending_tool_calls(output, response: nil, finish_reason: nil)
           calls = (parse_function_calls(output, response:, finish_reason:) || {})
                   .merge(parse_tool_approvals(output, response:, finish_reason:))
+                  .merge(parse_client_search_calls(output, response:, finish_reason:))
           calls unless calls.empty?
         end
       end

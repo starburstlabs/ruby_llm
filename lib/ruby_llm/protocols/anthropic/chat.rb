@@ -37,6 +37,8 @@ module RubyLLM
         def render_payload(messages, tools:, temperature:, model:, stream: false, max_output_tokens: nil,
                            schema: nil, thinking: nil, citations: false, caching: nil, tool_prefs: nil)
           warn_unsupported_citations(model) if citations && !model.supports?(:citations)
+          @search_tools = tools
+          @search_tool = RubyLLM::Tools::Search.handler(tools)
           tool_prefs ||= {}
           system_messages, chat_messages = separate_messages(messages)
           system_content = build_system_content(system_messages, caching:)
@@ -64,7 +66,7 @@ module RubyLLM
             thinking: thinking,
             citations: citations,
             caching: caching
-          ).then { |payload| Tools.apply_tool_search(payload) }.slice(*COUNT_TOKENS_KEYS)
+          ).then { |payload| apply_tool_search(payload) }.slice(*COUNT_TOKENS_KEYS)
         end
 
         def parse_count_tokens_response(response)
@@ -114,7 +116,7 @@ module RubyLLM
 
           messages.each do |msg|
             if msg.tool_result?
-              tool_result_blocks << Tools.format_tool_result_block(msg)
+              tool_result_blocks << format_tool_result_block(msg)
               inject_cache_control(tool_result_blocks, caching:, ttl: msg.cache_ttl) if cache_boundary?(msg, caching:)
               next
             end
@@ -343,7 +345,7 @@ module RubyLLM
           elsif msg.tool_call?
             format_tool_call_with_thinking(msg, caching:)
           elsif msg.tool_result?
-            Tools.format_tool_result(msg)
+            format_tool_result(msg)
           else
             format_basic_message_with_thinking(msg, citations: citations, caching:)
           end

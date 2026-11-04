@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe RubyLLM::Protocols::Anthropic::Tools do
   def tool(name, deferred:, provider_options: {})
-    base = instance_double(RubyLLM::Tool, name: name, description: "#{name} desc",
+    base = instance_double(RubyLLM::Tool, searches_tools?: false, name: name, description: "#{name} desc",
                                           parameters_schema: nil, declared_parameters: {},
                                           provider_options: provider_options)
     deferred ? RubyLLM::Tool::Deferred.new(base) : base

@@ -51,6 +51,7 @@ module RubyLLM
       @requires_approval
       @approval_resolver
       @deferred
+      @searches_tools
     ].freeze
     private_constant :DUPED_INHERITED_CONFIG, :COPIED_INHERITED_CONFIG
 
@@ -219,6 +220,17 @@ module RubyLLM
         @deferred || false
       end
 
+      # Declares that this tool searches the registered tools. Return
+      # ToolSearchResults from #execute to load matching definitions.
+      # Search tools are always offered up front, even with +defer: true+.
+      def searches_tools
+        @searches_tools = true
+      end
+
+      def searches_tools? # :nodoc:
+        @searches_tools || false
+      end
+
       def split_result(result) # :nodoc:
         case result
         when Attachment then ['', [result]]
@@ -245,7 +257,7 @@ module RubyLLM
       def result_content(result)
         case result
         when String then result
-        when Hash, Array, SearchResults then result.to_json
+        when Hash, Array, SearchResults, ToolSearchResults then result.to_json
         else result.to_s
         end
       end
@@ -268,6 +280,10 @@ module RubyLLM
     # Returns whether this tool was declared with ::requires_approval.
     def requires_approval?
       self.class.requires_approval?
+    end
+
+    def searches_tools? # :nodoc:
+      self.class.searches_tools?
     end
 
     def approval_resolver # :nodoc:

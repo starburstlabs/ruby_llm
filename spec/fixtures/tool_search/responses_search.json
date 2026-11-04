@@ -1,0 +1,20 @@
+{
+  "model": "gpt-5.4",
+  "status": "completed",
+  "output": [
+    {
+      "type": "tool_search_call",
+      "execution": "client",
+      "id": "item_search",
+      "call_id": "search_1",
+      "arguments": {
+        "query": "orders"
+      },
+      "status": "completed"
+    }
+  ],
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 3
+  }
+}

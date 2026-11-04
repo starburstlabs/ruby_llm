@@ -83,6 +83,9 @@ loader.setup
 # action. Tool.requires_approval pauses execution for a human decision;
 # Chat#approve and Chat#deny record it. Tool#progress reports what a
 # running tool is doing to Chat#after_tool_progress as a Progress.
+# Tool.searches_tools declares an application search handler that returns
+# ToolSearchResults for registered tools. Chat#with_tools accepts +defer: true+
+# to load their definitions through tool search.
 # Chat#with_provider_tools enables provider-executed tools such as web
 # search, code execution, and remote MCP.
 # Their calls appear as ServerToolCall values, with Citation values for sources.

@@ -14,7 +14,7 @@ module RubyLLM
             names << tool.name.to_sym if explicit.nil? ? server.defers?(tool) : explicit
           end
         end
-        names
+        names - tools.select { |_name, tool| tool.searches_tools? }.keys
       end
 
       def request_tools

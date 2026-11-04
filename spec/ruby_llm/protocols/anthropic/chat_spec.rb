@@ -3,6 +3,10 @@
 require 'spec_helper'
 
 RSpec.describe RubyLLM::Protocols::Anthropic::Chat do
+  let(:renderer) do
+    Object.new.extend(described_class, RubyLLM::Protocols::Anthropic::Tools, RubyLLM::Protocols::Anthropic::Media)
+  end
+
   describe '.parse_completion_response' do
     it 'normalizes stop_reason into finish_reason' do
       protocol = RubyLLM::Protocols::Anthropic.allocate
@@ -114,7 +118,7 @@ RSpec.describe RubyLLM::Protocols::Anthropic::Chat do
     it 'adds cache_control to a tool result marked as a cache boundary' do
       message = RubyLLM::Message.new(role: :tool, content: 'result', tool_call_id: 'tool_1').cache_until_here
 
-      rendered = described_class.format_messages([message], caching: { ttl: '1h' })
+      rendered = renderer.send(:format_messages, [message], caching: { ttl: '1h' })
 
       expect(rendered.first[:content].last[:cache_control]).to eq(type: 'ephemeral', ttl: '1h')
     end
@@ -194,8 +198,8 @@ RSpec.describe RubyLLM::Protocols::Anthropic::Chat do
         RubyLLM::Message.new(role: :tool, content: '2026-07-21', tool_call_id: 'tool_2')
       ]
 
-      payload = described_class.render_payload(
-        messages,
+      payload = renderer.send(
+        :render_payload, messages,
         tools: {},
         temperature: nil,
         model: model,
@@ -883,7 +887,7 @@ RSpec.describe RubyLLM::Protocols::Anthropic::Chat do
         RubyLLM::Message.new(role: :user, content: 'Hello')
       ]
 
-      payload = described_class.render_count_tokens_payload(messages, tools: {}, model: model)
+      payload = renderer.send(:render_count_tokens_payload, messages, tools: {}, model: model)
 
       expect(payload[:model]).to eq('claude-haiku-4-5')
       expect(payload[:messages]).to eq([{ role: 'user', content: [{ type: 'text', text: 'Hello' }] }])

@@ -60,6 +60,7 @@ component :domain, in: %w[
   lib/ruby_llm/tokens.rb
   lib/ruby_llm/tokenization.rb
   lib/ruby_llm/tool.rb
+  lib/ruby_llm/tool_search_results.rb
   lib/ruby_llm/tool_call.rb
   lib/ruby_llm/tools/**/*.rb
   lib/ruby_llm/transcription.rb
