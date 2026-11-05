@@ -7,8 +7,7 @@ http_interactions:
       encoding: UTF-8
       string: '{"model":"gpt-5.4","input":[{"role":"user","content":"First search
         for an order lookup tool, then use it to check order 42. What is its status?"}],"stream":false,"store":false,"include":["reasoning.encrypted_content"],"tools":[{"type":"tool_search","execution":"client","description":"Finds
-        tools for a task","parameters":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"type":"function","name":"lookup_order","description":"Looks
-        up an order","parameters":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"strict":false,"defer_loading":true}]}'
+        tools for a task","parameters":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}}]}'
     headers:
       User-Agent:
       - Faraday v2.15.1
@@ -26,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 04 Nov 2026 00:37:59 GMT
+      - Thu, 05 Nov 2026 19:23:15 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -50,7 +49,7 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '1179'
+      - '1369'
       Openai-Project:
       - "<OPENAI_PROJECT>"
       Openai-Version:
@@ -77,16 +76,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |-
         {
-          "id": "resp_0e1d842d7f8e0f74016aea7e66768c87d1b4f4fa8e8f5810ac",
+          "id": "resp_0079362c55dc5c55016aecd7a1c2b887d1832bf3c31c964acd",
           "object": "response",
-          "created_at": 1793752678,
+          "created_at": 1793906593,
           "status": "completed",
           "access_programs": null,
           "background": false,
           "billing": {
             "payer": "developer"
           },
-          "completed_at": 1793752679,
+          "completed_at": 1793906595,
           "error": null,
           "frequency_penalty": 0.0,
           "image": {
@@ -100,13 +99,13 @@ http_interactions:
           "moderation": null,
           "output": [
             {
-              "id": "tsc_0e1d842d7f8e0f74016aea7e676fac87d18627d61ed00dbaa2",
+              "id": "tsc_0079362c55dc5c55016aecd7a2f0cc87d1a11186235ce22e87",
               "type": "tool_search_call",
               "status": "completed",
               "arguments": {
                 "query": "order lookup tool"
               },
-              "call_id": "call_RRgZ9uHiMghdDWauSvGVVgOu",
+              "call_id": "call_7QFDxeNehFKc6yu1ZsqRiYiA",
               "execution": "client"
             }
           ],
@@ -152,27 +151,6 @@ http_interactions:
           },
           "tools": [
             {
-              "type": "function",
-              "defer_loading": true,
-              "description": "Looks up an order",
-              "name": "lookup_order",
-              "output_schema": null,
-              "parameters": {
-                "type": "object",
-                "properties": {
-                  "order_id": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "order_id"
-                ],
-                "additionalProperties": false,
-                "strict": true
-              },
-              "strict": false
-            },
-            {
               "type": "tool_search",
               "description": "Finds tools for a task",
               "execution": "client",
@@ -209,18 +187,17 @@ http_interactions:
           "user": null,
           "metadata": {}
         }
-  recorded_at: Wed, 04 Nov 2026 00:37:59 GMT
+  recorded_at: Thu, 05 Nov 2026 19:23:15 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/responses
     body:
       encoding: UTF-8
       string: '{"model":"gpt-5.4","input":[{"role":"user","content":"First search
-        for an order lookup tool, then use it to check order 42. What is its status?"},{"id":"tsc_0e1d842d7f8e0f74016aea7e676fac87d18627d61ed00dbaa2","type":"tool_search_call","status":"completed","arguments":{"query":"order
-        lookup tool"},"call_id":"call_RRgZ9uHiMghdDWauSvGVVgOu","execution":"client"},{"type":"tool_search_output","execution":"client","call_id":"call_RRgZ9uHiMghdDWauSvGVVgOu","status":"completed","tools":[{"type":"function","name":"lookup_order","description":"Looks
-        up an order","parameters":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"strict":false,"defer_loading":true}]}],"stream":false,"store":false,"include":["reasoning.encrypted_content"],"tools":[{"type":"tool_search","execution":"client","description":"Finds
-        tools for a task","parameters":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"type":"function","name":"lookup_order","description":"Looks
-        up an order","parameters":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"strict":false,"defer_loading":true}]}'
+        for an order lookup tool, then use it to check order 42. What is its status?"},{"id":"tsc_0079362c55dc5c55016aecd7a2f0cc87d1a11186235ce22e87","type":"tool_search_call","status":"completed","arguments":{"query":"order
+        lookup tool"},"call_id":"call_7QFDxeNehFKc6yu1ZsqRiYiA","execution":"client"},{"type":"tool_search_output","execution":"client","call_id":"call_7QFDxeNehFKc6yu1ZsqRiYiA","status":"completed","tools":[{"type":"function","name":"lookup_order","description":"Looks
+        up an order","parameters":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"strict":false}]}],"stream":false,"store":false,"include":["reasoning.encrypted_content"],"tools":[{"type":"tool_search","execution":"client","description":"Finds
+        tools for a task","parameters":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}}]}'
     headers:
       User-Agent:
       - Faraday v2.15.1
@@ -238,7 +215,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 04 Nov 2026 00:38:01 GMT
+      - Thu, 05 Nov 2026 19:23:16 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -262,7 +239,7 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '1185'
+      - '1359'
       Openai-Project:
       - "<OPENAI_PROJECT>"
       Openai-Version:
@@ -289,16 +266,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |-
         {
-          "id": "resp_0e1d842d7f8e0f74016aea7e680d7487d1a450db17c424518e",
+          "id": "resp_0079362c55dc5c55016aecd7a3576087d193ea07959d87eebb",
           "object": "response",
-          "created_at": 1793752680,
+          "created_at": 1793906595,
           "status": "completed",
           "access_programs": null,
           "background": false,
           "billing": {
             "payer": "developer"
           },
-          "completed_at": 1793752681,
+          "completed_at": 1793906596,
           "error": null,
           "frequency_penalty": 0.0,
           "image": {
@@ -312,11 +289,11 @@ http_interactions:
           "moderation": null,
           "output": [
             {
-              "id": "fc_0e1d842d7f8e0f74016aea7e69126887d193c2be6879b7506c",
+              "id": "fc_0079362c55dc5c55016aecd7a4759c87d1998a0fa5d0ac8bd5",
               "type": "function_call",
               "status": "completed",
               "arguments": "{\"order_id\":\"42\"}",
-              "call_id": "call_1Np7gTotUBtrTBhIC4Z0mjWD",
+              "call_id": "call_CQumorDni8U1xyxeJoKVpgGz",
               "name": "lookup_order",
               "namespace": "lookup_order"
             }
@@ -426,19 +403,18 @@ http_interactions:
           "user": null,
           "metadata": {}
         }
-  recorded_at: Wed, 04 Nov 2026 00:38:01 GMT
+  recorded_at: Thu, 05 Nov 2026 19:23:16 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/responses
     body:
       encoding: UTF-8
       string: '{"model":"gpt-5.4","input":[{"role":"user","content":"First search
-        for an order lookup tool, then use it to check order 42. What is its status?"},{"id":"tsc_0e1d842d7f8e0f74016aea7e676fac87d18627d61ed00dbaa2","type":"tool_search_call","status":"completed","arguments":{"query":"order
-        lookup tool"},"call_id":"call_RRgZ9uHiMghdDWauSvGVVgOu","execution":"client"},{"type":"tool_search_output","execution":"client","call_id":"call_RRgZ9uHiMghdDWauSvGVVgOu","status":"completed","tools":[{"type":"function","name":"lookup_order","description":"Looks
-        up an order","parameters":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"strict":false,"defer_loading":true}]},{"id":"fc_0e1d842d7f8e0f74016aea7e69126887d193c2be6879b7506c","type":"function_call","status":"completed","arguments":"{\"order_id\":\"42\"}","call_id":"call_1Np7gTotUBtrTBhIC4Z0mjWD","name":"lookup_order","namespace":"lookup_order"},{"type":"function_call_output","call_id":"call_1Np7gTotUBtrTBhIC4Z0mjWD","output":"Order
+        for an order lookup tool, then use it to check order 42. What is its status?"},{"id":"tsc_0079362c55dc5c55016aecd7a2f0cc87d1a11186235ce22e87","type":"tool_search_call","status":"completed","arguments":{"query":"order
+        lookup tool"},"call_id":"call_7QFDxeNehFKc6yu1ZsqRiYiA","execution":"client"},{"type":"tool_search_output","execution":"client","call_id":"call_7QFDxeNehFKc6yu1ZsqRiYiA","status":"completed","tools":[{"type":"function","name":"lookup_order","description":"Looks
+        up an order","parameters":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"strict":false}]},{"id":"fc_0079362c55dc5c55016aecd7a4759c87d1998a0fa5d0ac8bd5","type":"function_call","status":"completed","arguments":"{\"order_id\":\"42\"}","call_id":"call_CQumorDni8U1xyxeJoKVpgGz","name":"lookup_order","namespace":"lookup_order"},{"type":"function_call_output","call_id":"call_CQumorDni8U1xyxeJoKVpgGz","output":"Order
         42 shipped"}],"stream":false,"store":false,"include":["reasoning.encrypted_content"],"tools":[{"type":"tool_search","execution":"client","description":"Finds
-        tools for a task","parameters":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"type":"function","name":"lookup_order","description":"Looks
-        up an order","parameters":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"strict":false,"defer_loading":true}]}'
+        tools for a task","parameters":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}}]}'
     headers:
       User-Agent:
       - Faraday v2.15.1
@@ -456,7 +432,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 04 Nov 2026 00:38:02 GMT
+      - Thu, 05 Nov 2026 19:23:18 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -480,21 +456,21 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '948'
+      - '1299'
       Openai-Project:
       - "<OPENAI_PROJECT>"
       Openai-Version:
       - '2020-10-01'
       X-Ratelimit-Limit-Requests:
-      - '50'
+      - '5000'
       X-Ratelimit-Limit-Tokens:
-      - '10000'
+      - '1000000'
       X-Ratelimit-Remaining-Requests:
-      - '49'
+      - '4999'
       X-Ratelimit-Remaining-Tokens:
-      - '10000'
+      - '1000000'
       X-Ratelimit-Reset-Requests:
-      - 28m48s
+      - 12ms
       X-Ratelimit-Reset-Tokens:
       - 0s
       X-Request-Id:
@@ -507,16 +483,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |-
         {
-          "id": "resp_0e1d842d7f8e0f74016aea7e6984a487d1aa95a1782289d362",
+          "id": "resp_0079362c55dc5c55016aecd7a4dbbc87d1a5d44270a09ff9ff",
           "object": "response",
-          "created_at": 1793752681,
+          "created_at": 1793906596,
           "status": "completed",
           "access_programs": null,
           "background": false,
           "billing": {
             "payer": "developer"
           },
-          "completed_at": 1793752682,
+          "completed_at": 1793906598,
           "error": null,
           "frequency_penalty": 0.0,
           "image": {
@@ -530,7 +506,7 @@ http_interactions:
           "moderation": null,
           "output": [
             {
-              "id": "msg_0e1d842d7f8e0f74016aea7e6a594087d1ad8323f28c342197",
+              "id": "msg_0079362c55dc5c55016aecd7a5dbd087d1959ac90db991abaf",
               "type": "message",
               "status": "completed",
               "content": [
@@ -538,7 +514,7 @@ http_interactions:
                   "type": "output_text",
                   "annotations": [],
                   "logprobs": [],
-                  "text": "Order 42 is shipped."
+                  "text": "Order 42: shipped."
                 }
               ],
               "phase": "final_answer",
@@ -650,5 +626,5 @@ http_interactions:
           "user": null,
           "metadata": {}
         }
-  recorded_at: Wed, 04 Nov 2026 00:38:02 GMT
+  recorded_at: Thu, 05 Nov 2026 19:23:18 GMT
 recorded_with: VCR 6.4.1

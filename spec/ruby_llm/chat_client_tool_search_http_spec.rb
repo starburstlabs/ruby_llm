@@ -68,9 +68,19 @@ RSpec.describe RubyLLM::Chat do
         expect(reply.content).to eq('Order 42 shipped')
         expect(finder.queries).to eq(['orders'])
         expect(requests.size).to eq(3)
+        requests.each do |request|
+          expect(request.fetch('tools')).to contain_exactly(hash_including('type' => 'tool_search',
+                                                                           'execution' => 'client'))
+        end
         search_output = requests[1]['input'].find { |item| item['type'] == 'tool_search_output' }
-        expect(search_output).to eq('type' => 'tool_search_output', 'execution' => 'client', 'call_id' => 'search_1',
-                                    'status' => 'completed', 'tools' => [requests[1]['tools'].last])
+        expect(search_output).to include('type' => 'tool_search_output', 'execution' => 'client',
+                                         'call_id' => 'search_1', 'status' => 'completed')
+        loaded = search_output.fetch('tools').fetch(0)
+        expect(loaded).to include('type' => 'function', 'name' => 'lookup_order',
+                                  'parameters' => hash_including('required' => ['order_id']))
+        expect(loaded).not_to have_key('defer_loading')
+        expect(requests[2]['input']).to include(hash_including('type' => 'function_call',
+                                                               'call_id' => 'order_1', 'namespace' => 'lookup_order'))
         expect(requests[2]['input'].last).to include('type' => 'function_call_output', 'call_id' => 'order_1',
                                                      'output' => 'Order 42 shipped')
         expect(chat.messages.select(&:tool_result?).map(&:tool_call_id)).to eq(%w[search_1 order_1])

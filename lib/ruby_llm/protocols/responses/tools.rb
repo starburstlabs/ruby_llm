@@ -38,13 +38,21 @@ module RubyLLM
         # search items in the input of a request that declares none.
         def apply_tool_search(payload)
           tools = Array(payload[:tools])
-          return payload.merge(input: without_hosted_search_items(payload[:input])) if client_search_only?(tools)
-          return payload if tools.any? { |tool| search_tool?(tool) }
+          return apply_client_tool_search(payload, tools) if client_search_only?(tools)
+          if tools.any? { |tool| search_tool?(tool) }
+            return payload.merge(input: Chat.format_client_search_namespaces(payload[:input]))
+          end
           return payload.merge(tools: tools + [NATIVE_TOOL_SEARCH.dup]) if defers_loading?(tools)
 
           payload.merge(input: payload[:input].reject do |item|
             Chat::TOOL_SEARCH_ITEM_TYPES.include?(item[:type] || item['type'])
           end)
+        end
+
+        def apply_client_tool_search(payload, tools)
+          definitions = tools.reject { |tool| RubyLLM::Support::Utils.hash_get(tool, :defer_loading) }
+          input = without_hosted_search_items(payload[:input])
+          payload.merge(tools: definitions, input: Chat.format_client_search_namespaces(input))
         end
 
         def client_search_only?(tools)

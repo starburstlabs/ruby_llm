@@ -18,11 +18,12 @@ RSpec.describe RubyLLM::Chat, :live do
           response = chat.ask(question)
 
           expect(finder.queries).not_to be_empty
-          expect(response.content.downcase).to include('42', 'shipped')
+          expect(response.content.downcase).to include('shipped')
           result = chat.messages.find { |message| RubyLLM::ToolSearchResults.from_content(message.content) }
           expect(RubyLLM::ToolSearchResults.from_content(result.content).names).to eq(['lookup_order'])
-          expect(chat.messages.select(&:tool_call?).flat_map { |message| message.tool_calls.values.map(&:name) })
-            .to include('find_tools', 'lookup_order')
+          calls = chat.messages.select(&:tool_call?).flat_map { |message| message.tool_calls.values }
+          expect(calls).to include(have_attributes(name: 'find_tools'),
+                                   have_attributes(name: 'lookup_order', arguments: { 'order_id' => '42' }))
         end
 
         it 'searches and executes the matching tool while streaming' do
@@ -30,7 +31,9 @@ RSpec.describe RubyLLM::Chat, :live do
           response = chat.ask(question) { |chunk| chunks << chunk }
 
           expect(finder.queries).not_to be_empty
-          expect(response.content.downcase).to include('42', 'shipped')
+          expect(response.content.downcase).to include('shipped')
+          calls = chat.messages.select(&:tool_call?).flat_map { |message| message.tool_calls.values }
+          expect(calls).to include(have_attributes(name: 'lookup_order', arguments: { 'order_id' => '42' }))
           expect(chunks).not_to be_empty
           expect(chat.messages.count(&:tool_result?)).to be >= 2
         end

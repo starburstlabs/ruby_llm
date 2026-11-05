@@ -393,13 +393,35 @@ module RubyLLM
           results = RubyLLM::ToolSearchResults.from_content(msg.content)
           tools = results ? RubyLLM::Tools::Search.replay(results, @search_tools || {}) : []
           items = [{ type: 'tool_search_output', execution: 'client', call_id: msg.tool_call_id, status: 'completed',
-                     tools: tools.map { |tool| tool_for(tool) } }]
+                     tools: tools.map { |tool| tool_for(tool).except(:defer_loading, 'defer_loading') } }]
           unless results
             text = msg.content.to_s
             text = '(no output)' if text.empty?
             items << { role: 'user', content: [{ type: 'input_text', text: }] }
           end
           items
+        end
+
+        def format_client_search_namespaces(input)
+          return input unless input.is_a?(Array)
+
+          namespaces = {}
+          input.map do |original|
+            item = original.transform_keys(&:to_sym)
+            case item.values_at(:type, :execution)
+            when %w[tool_search_output client]
+              item.fetch(:tools).each do |tool|
+                name = RubyLLM::Support::Utils.hash_get(tool, :name)
+                namespaces[name] = name
+              end
+              original
+            when ['function_call', nil]
+              namespace = namespaces[item[:name]]
+              namespace && !item[:namespace] ? item.merge(namespace:) : original
+            else
+              original
+            end
+          end
         end
 
         def format_assistant_items(msg)

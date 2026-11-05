@@ -20,13 +20,13 @@ RSpec.describe RubyLLM::Protocols::Responses::Chat do
     [pending_search_message(raw: [client_search_item]), search_result_message(result)]
   end
 
-  it 'declares a nameless client search and preserves all target definitions' do
-    declarations = render[:tools]
+  it 'declares a nameless client search without exposing deferred targets' do
+    payload = render
+    declarations = protocol.send(:apply_tool_search, payload)[:tools]
 
-    expect(declarations.first).to eq(type: 'tool_search', execution: 'client', description: finder.description,
-                                     parameters: finder.parameters_schema)
-    expect(declarations.last).to eq(protocol.send(:tool_for, tools[:lookup_order]))
-    expect(protocol.send(:apply_tool_search, render)[:tools]).to eq(declarations)
+    expect(declarations).to eq([{ type: 'tool_search', execution: 'client', description: finder.description,
+                                  parameters: finder.parameters_schema }])
+    expect(protocol.send(:apply_tool_search, payload)[:tools]).to eq(declarations)
   end
 
   it 'normalizes client calls by call_id and the real Ruby handler name' do
@@ -91,11 +91,52 @@ RSpec.describe RubyLLM::Protocols::Responses::Chat do
     end
   end
 
-  it 'renders exact tool definitions including deferral flags in native outputs' do
+  it 'renders loaded definitions without deferral flags in native outputs' do
     payload = render(native_history)
 
     expect(payload[:input].last).to eq(type: 'tool_search_output', execution: 'client', call_id: 'search_1',
-                                       status: 'completed', tools: [payload[:tools].last])
+                                       status: 'completed', tools: [payload[:tools].last.except(:defer_loading)])
+  end
+
+  def target_call_message(call_id, name: target.name)
+    call = RubyLLM::ToolCall.new(id: call_id, name:, arguments: { 'order_id' => '42' })
+    RubyLLM::Message.new(role: :assistant, content: nil, tool_calls: { call.id => call })
+  end
+
+  def rendered_calls(messages)
+    payload = render(messages)
+    protocol.send(:apply_tool_search, payload)[:input]
+            .map { |item| item.transform_keys(&:to_sym) }
+            .select { |item| item[:type] == 'function_call' }
+  end
+
+  it 'adds namespaces only to calls after their client discovery' do
+    messages = [target_call_message('before'), *native_history,
+                target_call_message('after'), target_call_message('ordinary', name: 'current_time')]
+
+    expect(rendered_calls(messages).map { |item| item[:namespace] }).to eq([nil, 'lookup_order', nil])
+    expect(rendered_calls([target_call_message('fresh')]).first).not_to have_key(:namespace)
+  end
+
+  it 'repairs frozen raw calls without changing history or an explicit namespace' do
+    raw_call = { 'type' => 'function_call', 'call_id' => 'raw', 'name' => target.name,
+                 'arguments' => '{"order_id":"42"}' }.freeze
+    namespaced_call = raw_call.merge('call_id' => 'namespaced', 'namespace' => 'orders').freeze
+    message = RubyLLM::Message.new(role: :assistant, content: nil, raw_content: [raw_call, namespaced_call])
+
+    expect(rendered_calls([*native_history, message]).map { |item| item[:namespace] })
+      .to eq(%w[lookup_order orders])
+    expect(raw_call).not_to have_key('namespace')
+  end
+
+  it 'keeps the hosted inventory while repairing client calls in a mixed request' do
+    payload = render([*native_history, target_call_message('mixed')])
+    payload[:tools] << { type: 'tool_search' }
+    rendered = protocol.send(:apply_tool_search, payload)
+
+    expect(rendered[:tools]).to eq(payload[:tools])
+    expect(rendered[:tools]).to include(hash_including(name: target.name, defer_loading: true))
+    expect(rendered[:input].last).to include(type: 'function_call', namespace: target.name)
   end
 
   it 'accepts eager matches without promoting deferred definitions' do

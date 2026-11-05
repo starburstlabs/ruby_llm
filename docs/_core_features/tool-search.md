@@ -126,6 +126,8 @@ Search calls use the ordinary tool loop, including callbacks, approvals, and can
 
 Anthropic and OpenAI Responses load the returned definitions through their native tool search formats. Other protocols receive an ordinary function call and JSON results, with every registered tool offered up front. OpenAI Responses cannot force a named search handler through `with_tool_options(choice: :find_tools)` because its search declaration has no name. Use `:auto` or `:required` instead.
 
+With application search on OpenAI Responses, deferred tools stay out of the request's tool definitions. Search results load their definitions where discovery occurs in the conversation. Hosted search still receives the full catalog.
+
 Search results persist as tool names in ordinary message content. When you reload a Rails chat, register its tools again through `with_tools` or its Agent. RubyLLM renders the current definitions. If an old result names a tool you have since removed or hidden, RubyLLM omits that match and logs a warning without changing the stored result.
 
 Removing the search handler makes earlier calls replay as ordinary function calls and results. Replacing or renaming it preserves native OpenAI search history. Batch results do not expose client search calls as executable Ruby tool calls.

@@ -21,6 +21,12 @@ RSpec.describe RubyLLM::Protocols::Responses::Tools do
   end
 
   describe '.apply_tool_search' do
+    it 'preserves string input for hosted search' do
+      payload = { tools: [{ type: 'tool_search' }], input: 'Find an order' }
+
+      expect(described_class.apply_tool_search(payload)).to eq(payload)
+    end
+
     def payload_tools(*tools)
       described_class.apply_tool_search({ tools: tools.map { |t| described_class.tool_for(t) }, input: [] })[:tools]
     end
