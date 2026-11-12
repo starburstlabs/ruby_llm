@@ -134,7 +134,9 @@ loader.setup
 # OCR returns document pages and combined markdown. Embedding returns
 # vectors for text or supported media, and RubyLLM.rerank returns a Rerank
 # whose results order documents by relevance. SearchResults lets a Tool
-# return source documents that the model can cite.
+# return source documents that the model can cite, and ToolSearchResults
+# lets a Tool declared with Tool.searches_tools name the deferred tools
+# it found, so the chat loads them.
 #
 # RubyLLM.upload returns an UploadedFile for reuse across requests.
 # RubyLLM.download returns a DownloadedFile with the same saving interface:

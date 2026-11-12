@@ -26,6 +26,7 @@ After reading this guide, you will know:
 *   Why large tool sets need tool search.
 *   How to defer the tools of an MCP server, a chat, an agent, or a tool class.
 *   How to see which tools are deferred and which ones the model found.
+*   How to search with a tool of your own.
 *   Which providers search for tools, and what happens on the others.
 
 ## Why Defer Tools
@@ -146,6 +147,41 @@ chat.with_provider_tools({ type: "tool_search_tool_regex_20251119", name: "tool_
 ```
 
 See [Provider Tools]({% link _tools/provider-tools.md %}) for how raw tool definitions work.
+
+## Searching With Your Own Tool
+
+The provider's search ranks your tools by their names and descriptions. When your application has a better index, such as embeddings, or a catalog scoped to the current account, write the search as a tool and declare `searches_tools`:
+
+```ruby
+class CatalogSearch < RubyLLM::Tool
+  description "Finds tools for a task. Describe the task in a few words."
+  searches_tools
+
+  def execute(query:)
+    RubyLLM::ToolSearchResults.new(*ToolIndex.nearest(query, limit: 5))
+  end
+end
+
+chat = RubyLLM.chat(model: "{{ site.models.anthropic_current }}")
+chat.with_tools(CatalogSearch, *Catalog.tools, defer: true)
+chat.ask "Refund order 42"
+```
+
+`CatalogSearch` is now the chat's search tool, on every provider. It is never deferred, even inside `defer: true`, and the chat offers it while it has deferred tools. `ToolSearchResults.new` takes Tool classes, Tool instances, or the names the chat registers tools under (`:crm_customer_lookup` for a namespaced one), and the chat loads the deferred tools it names. A name that is not one of the chat's deferred tools loads nothing. Return a String instead when nothing matched and the model should hear why.
+
+Claude and GPT load the tools your search found the way they load the ones their own search finds, so the tool list stays the same across loads and a prompt cache keeps hitting. Every other provider gets the definitions appended to the next request, as with `tool_search`. The search and its result are an ordinary tool call in `messages`, so a persisted chat replays them on any provider, and what the search loaded stays loaded when the chat moves to another provider.
+
+Agents declare the search tool like any other:
+
+```ruby
+class SupportAgent < RubyLLM::Agent
+  model "{{ site.models.openai_current }}"
+  tools ConnectorSearch
+  mcp Zendesk, Stripe, defer: true
+end
+```
+
+Register one search tool per chat; a second raises `ArgumentError`. An MCP server's tool cannot declare `searches_tools`, so a search that runs on a server is a Tool of your own that calls it.
 
 ## Provider Support
 
