@@ -73,6 +73,23 @@ RSpec.describe RubyLLM::Providers::Bedrock::Anthropic do
       expect(body).not_to include('model', 'stream')
     end
 
+    it 'sends an application search with deferred tools and the beta, without the hosted search' do
+      search = Class.new(RubyLLM::Tool) do
+        description 'Finds tools for a task'
+        searches_tools
+        def self.tool_name = 'find_tools'
+        def execute(query:) = RubyLLM::ToolSearchResults.new(query)
+      end
+      body = nil
+      stub_invoke { |req| body = JSON.parse(req.body) }
+
+      chat.with_tools(search).with_tools(BedrockAnthropicWeather, defer: true).ask('Weather in Berlin?')
+
+      expect(body['tools'].map { |tool| tool.slice('name', 'defer_loading') })
+        .to eq([{ 'name' => 'bedrock_anthropic_weather', 'defer_loading' => true }, { 'name' => 'find_tools' }])
+      expect(body['anthropic_beta']).to include('tool-search-tool-2025-10-19')
+    end
+
     it 'moves betas from headers into the body' do
       body = nil
       headers = nil

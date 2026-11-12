@@ -29,11 +29,11 @@ module RubyLLM
           }
         end
 
-        def render_tool_result_block(msg, citations: false, tool_call: nil)
+        def render_tool_result_block(msg, citations: false, tool_call: nil, tools: nil)
           block = {
             type: 'tool_result',
             tool_use_id: msg.provider_call_id,
-            content: render_tool_result_content(msg, citations:)
+            content: render_tool_references(msg, tool_call, tools) || render_tool_result_content(msg, citations:)
           }
           return block unless tool_call&.namespace
 
@@ -42,6 +42,18 @@ module RubyLLM
           return block unless error
 
           block.merge(is_error: true, content: [{ type: 'text', text: error.to_s }])
+        end
+
+        def render_tool_references(msg, tool_call, tools)
+          return unless tools && tool_call && RubyLLM::Tools::Search.search?(tool_call, tools)
+
+          results = RubyLLM::ToolSearchResults.from_content(msg.content)
+          return unless results
+
+          references = results.within(tools).each_value.filter_map do |tool|
+            { type: 'tool_reference', tool_name: tool.name } if tool.namespace.nil?
+          end
+          references unless references.empty?
         end
 
         def render_tool_result_content(msg, citations: false)
@@ -92,12 +104,15 @@ module RubyLLM
           tool.is_a?(RubyLLM::Tool::Deferred)
         end
 
-        # The API requires a search tool next to deferred tools, and rejects
-        # search blocks in the history of a request that declares none.
-        def apply_tool_search(payload, _tools = {})
-          tools = Array(payload[:tools])
-          return payload if tools.any? { |tool| search_tool?(tool) }
-          return payload.merge(tools: tools + [NATIVE_TOOL_SEARCH.dup]) if defers_loading?(tools)
+        # The API requires a search tool next to deferred tools, which an
+        # application's search satisfies, and rejects hosted search blocks
+        # in the history of a request that declares no hosted search.
+        def apply_tool_search(payload, tools = {})
+          declared = Array(payload[:tools])
+          return payload if declared.any? { |tool| search_tool?(tool) }
+
+          searched = RubyLLM::Tools::Search.declared(tools)
+          return payload.merge(tools: declared + [NATIVE_TOOL_SEARCH.dup]) if defers_loading?(declared) && !searched
 
           payload.merge(messages: without_tool_search_blocks(payload[:messages]))
         end

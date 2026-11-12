@@ -44,7 +44,7 @@ module RubyLLM
           system_content = build_system_content(system_messages, caching:)
 
           build_base_payload(chat_messages, model, stream, thinking, citations: citations, caching:,
-                                                                     max_output_tokens:).tap do |payload|
+                                                                     max_output_tokens:, tools:).tap do |payload|
             add_optional_fields(payload, system_content:, tools:, tool_prefs:, temperature:, schema:)
             payload[:cache_control] = prompt_cache_control(caching) if caching
           end
@@ -66,7 +66,7 @@ module RubyLLM
             thinking: thinking,
             citations: citations,
             caching: caching
-          ).then { |payload| Tools.apply_tool_search(payload) }.slice(*COUNT_TOKENS_KEYS).tap do |payload|
+          ).then { |payload| Tools.apply_tool_search(payload, tools) }.slice(*COUNT_TOKENS_KEYS).tap do |payload|
             payload[:thinking]&.delete(:block_binding)
           end
         end
@@ -97,10 +97,10 @@ module RubyLLM
         end
 
         def build_base_payload(chat_messages, model, stream, thinking, citations: false, caching: nil,
-                               max_output_tokens: nil)
+                               max_output_tokens: nil, tools: {})
           payload = {
             model: model.id,
-            messages: render_messages(chat_messages, thinking:, citations:, caching:),
+            messages: render_messages(chat_messages, thinking:, citations:, caching:, tools:),
             stream: stream,
             max_tokens: max_output_tokens || model.max_output_tokens || DEFAULT_MAX_OUTPUT_TOKENS
           }
@@ -126,15 +126,17 @@ module RubyLLM
           true
         end
 
-        def render_messages(messages, thinking: nil, citations: false, caching: nil)
+        def render_messages(messages, thinking: nil, citations: false, caching: nil, tools: {})
           rendered = []
           tool_result_blocks = []
           calls = {}
+          searched = tools if RubyLLM::Tools::Search.declared(tools)
 
           messages.each do |msg|
             calls.merge!(msg.tool_calls.to_h)
             if msg.tool_result?
-              tool_result_blocks << Tools.render_tool_result_block(msg, citations:, tool_call: calls[msg.tool_call_id])
+              tool_result_blocks << Tools.render_tool_result_block(msg, citations:, tool_call: calls[msg.tool_call_id],
+                                                                        tools: searched)
               inject_cache_control(tool_result_blocks, caching:, ttl: msg.cache_ttl) if cache_boundary?(msg, caching:)
               next
             end

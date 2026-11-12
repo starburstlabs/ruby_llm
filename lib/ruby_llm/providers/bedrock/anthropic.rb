@@ -81,11 +81,13 @@ module RubyLLM
           @connection.post(count_tokens_url, JSON.generate(request))
         end
 
-        # Bedrock still gates the tool search tool behind its beta.
+        # Bedrock still gates tool search, and deferred loading with it,
+        # behind its beta.
         def beta_headers(additional_headers, payload)
           headers = super
           tools = Array(payload[:tools] || payload['tools'])
-          tools.any? { |tool| search_tool?(tool) } ? add_beta(headers, TOOL_SEARCH_BETA) : headers
+          searching = tools.any? { |tool| search_tool?(tool) } || defers_loading?(tools)
+          searching ? add_beta(headers, TOOL_SEARCH_BETA) : headers
         end
 
         # InvokeModel takes Anthropic's betas in the body, not as a header.
