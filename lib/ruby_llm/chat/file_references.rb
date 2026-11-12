@@ -84,7 +84,9 @@ module RubyLLM
       end
 
       def spill(tool, tool_call, content)
-        limit = tool.respond_to?(:inline_limit) ? tool.inline_limit : nil
+        return content if tool&.searches_tools?
+
+        limit = tool&.inline_limit
         limit = @inline_limit if limit.nil?
         return content unless limit && content.is_a?(String) && content.length > limit
 

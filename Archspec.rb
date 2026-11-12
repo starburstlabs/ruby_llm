@@ -58,6 +58,7 @@ component :domain, in: %w[
   lib/ruby_llm/sandbox/**/*.rb
   lib/ruby_llm/search_results.rb
   lib/ruby_llm/server_tool_call.rb
+  lib/ruby_llm/tool_search_results.rb
   lib/ruby_llm/skill.rb
   lib/ruby_llm/skill/**/*.rb
   lib/ruby_llm/speech.rb

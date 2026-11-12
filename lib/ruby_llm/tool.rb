@@ -64,6 +64,7 @@ module RubyLLM
       @exclusive
       @max_run_time
       @inline_limit
+      @searches_tools
     ].freeze
     private_constant :DUPED_INHERITED_CONFIG, :COPIED_INHERITED_CONFIG
 
@@ -336,6 +337,29 @@ module RubyLLM
         @deferred || false
       end
 
+      # Makes this tool the chat's tool search, in place of the provider's
+      # or RubyLLM's own. #execute returns a ToolSearchResults naming the
+      # deferred tools it found, and the chat loads them. A chat never
+      # defers its search tool or saves its results as files, and offers
+      # it while it has deferred tools. See Chat#deferred_tools.
+      #
+      #   class CatalogSearch < RubyLLM::Tool
+      #     description "Finds tools for a task"
+      #     searches_tools
+      #
+      #     def execute(query:)
+      #       RubyLLM::ToolSearchResults.new(*ToolIndex.nearest(query))
+      #     end
+      #   end
+      #
+      def searches_tools
+        @searches_tools = true
+      end
+
+      def searches_tools? # :nodoc:
+        @searches_tools || false
+      end
+
       # :call-seq:
       #   inline_limit(characters) -> characters
       #   inline_limit(false) -> false
@@ -388,7 +412,7 @@ module RubyLLM
       def result_content(result)
         case result
         when String then result
-        when Hash, Array, SearchResults then result.to_json
+        when Hash, Array, SearchResults, ToolSearchResults then result.to_json
         else result.to_s
         end
       end
@@ -474,6 +498,10 @@ module RubyLLM
     # it was deferred with #defer, or its class with ::defer.
     def deferred?
       @deferred || self.class.deferred?
+    end
+
+    def searches_tools? # :nodoc:
+      self.class.searches_tools?
     end
 
     class Deferred < SimpleDelegator # :nodoc:

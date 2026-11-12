@@ -189,7 +189,7 @@ module RubyLLM
       payload = apply_compaction(payload, compaction) if compaction
       payload = Support::Utils.deep_merge(payload, provider_options)
       payload = apply_provider_tools(payload, provider_tools)
-      payload = apply_tool_search(payload)
+      payload = apply_tool_search(payload, tools)
       apply_before_request_hooks(payload, before_request)
     end
 
@@ -679,7 +679,7 @@ module RubyLLM
       payload[:tools] = Array(payload[:tools]) + entries
     end
 
-    def apply_tool_search(payload)
+    def apply_tool_search(payload, _tools = {})
       payload
     end
 

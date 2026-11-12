@@ -4,9 +4,9 @@ module RubyLLM
   class Chat
     # Deferred tool registration and the tool set rendered for the request.
     # A provider with tool search of its own gets every tool, the deferred
-    # ones marked. Any other gets the tools that are not deferred, a
-    # +tool_search+ tool, and the deferred tools the conversation has loaded
-    # with it or called, in the order it first did, so every request repeats
+    # ones marked. Any other gets the tools that are not deferred, the
+    # search tool, and the deferred tools the conversation has loaded with
+    # it or called, in the order it first did, so every request repeats
     # the one before it and adds to its end.
     module ToolSearch # :nodoc:
       private
@@ -31,12 +31,16 @@ module RubyLLM
 
       def searched_request_tools(deferred)
         all = tools
-        loaded = loaded_tool_names(deferred).select { |name| all.key?(name) }
+        loaded = loaded_tool_names(deferred, all).select { |name| all.key?(name) }
         all.except(*deferred).merge(all.slice(*loaded))
       end
 
       def tool_search_tool
-        return unless searching_tools_here?(deferred_tool_names)
+        return if deferred_tool_names.empty?
+
+        registered = @tools.each_value.find(&:searches_tools?)
+        return registered if registered
+        return if @provider.tool_search?(@model, protocol: @protocol)
 
         @tool_search_tool ||= Tools::Search.new(-> { deferred_tools })
       end
@@ -45,16 +49,27 @@ module RubyLLM
         deferred.any? && !@provider.tool_search?(@model, protocol: @protocol)
       end
 
-      def loaded_tool_names(deferred)
-        results = messages.select(&:tool_result?).to_h { |message| [message.tool_call_id, message.content] }
-        calls = messages.select(&:tool_call?).flat_map { |message| message.tool_calls.to_a }
-        calls.flat_map { |tool_call| names_loaded_by(tool_call, results) }.uniq & deferred
+      def check_tool_search(name, tool)
+        return unless tool.searches_tools?
+
+        other = @tools.each_key.find { |key| key != name && @tools[key].searches_tools? }
+        raise ArgumentError, "#{other} and #{name} both search tools. Register one" if other
       end
 
-      def names_loaded_by(tool_call, results)
-        return [tool_call.qualified_name.to_sym] unless tool_call.qualified_name == Tools::Search.tool_name
+      def deferred_registration?(tool, defer)
+        !tool.searches_tools? && (defer.nil? ? tool.deferred? : defer)
+      end
 
-        Tools::Search.loaded_names(results[tool_call.id]).map(&:to_sym)
+      def loaded_tool_names(deferred, all)
+        results = messages.select(&:tool_result?).to_h { |message| [message.tool_call_id, message.content] }
+        calls = messages.select(&:tool_call?).flat_map { |message| message.tool_calls.to_a }
+        calls.flat_map { |tool_call| names_loaded_by(tool_call, results, all) }.uniq & deferred
+      end
+
+      def names_loaded_by(tool_call, results, all)
+        return [tool_call.qualified_name.to_sym] unless Tools::Search.search?(tool_call, all)
+
+        Array(ToolSearchResults.from_content(results[tool_call.id])&.names).map(&:to_sym)
       end
     end
   end

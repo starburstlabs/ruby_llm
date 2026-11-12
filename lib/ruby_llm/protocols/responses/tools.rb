@@ -58,7 +58,7 @@ module RubyLLM
 
         # The API requires a search tool next to deferred tools, and rejects
         # search items in the input of a request that declares none.
-        def apply_tool_search(payload)
+        def apply_tool_search(payload, _tools = {})
           tools = Array(payload[:tools])
           return payload if tools.any? { |tool| search_tool?(tool) }
           return payload.merge(tools: tools + [NATIVE_TOOL_SEARCH.dup]) if defers_loading?(tools)

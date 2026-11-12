@@ -14,16 +14,21 @@ module RubyLLM
       SUMMARY_LENGTH = 200
 
       inline_limit false
+      searches_tools
 
       def self.tool_name
         'tool_search'
       end
 
-      def self.loaded_names(content)
-        names = JSON.parse(content.to_s)['loaded'] if content.to_s.start_with?('{')
-        names.is_a?(Array) ? names.map(&:to_s) : []
-      rescue JSON::ParserError
-        []
+      def self.search?(tool_call, tools)
+        tool = tools[tool_call.qualified_name.to_sym]
+        tool ? tool.searches_tools? : tool_call.qualified_name == tool_name
+      end
+
+      def self.declared(tools)
+        return unless tools.each_value.any?(Tool::Deferred)
+
+        tools.each_value.find(&:searches_tools?)
       end
 
       def initialize(tools)
@@ -66,11 +71,12 @@ module RubyLLM
       private
 
       def nothing_found(tools, query)
-        { loaded: [], error: "No tools match #{query}. Tools you can load: #{tools.keys.join(', ')}" }
+        ToolSearchResults.new.to_h.merge(error: "No tools match #{query}. Tools you can load: #{tools.keys.join(', ')}")
       end
 
       def loaded(found)
-        { loaded: found.map(&:first), tools: found.map { |name, tool| { name:, description: summary(tool) } } }
+        ToolSearchResults.new(*found.map(&:first)).to_h
+                         .merge(tools: found.map { |name, tool| { name:, description: summary(tool) } })
       end
 
       def matches(tools, query, limit)

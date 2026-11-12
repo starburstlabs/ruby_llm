@@ -1461,6 +1461,7 @@ RubyLLM::Tool.provider_options -> hash
 RubyLLM::Tool.provider_options(options) -> self
 RubyLLM::Tool.requires_approval(&resolver)
 RubyLLM::Tool.rescue_from(*exception_classes, with: nil, &block)
+RubyLLM::Tool.searches_tools
 RubyLLM::Tool.tool_name
 RubyLLM::ToolCall (class)
 RubyLLM::ToolCall include Support::Inspectable
@@ -1497,6 +1498,10 @@ RubyLLM::ToolCallParseError#finish_reason (attr_reader)
 RubyLLM::ToolCallRunningError (class < StandardError)
 RubyLLM::ToolCallTruncatedError (class < RubyLLM::ToolCallParseError)
 RubyLLM::ToolRoundLimitError (class < StandardError)
+RubyLLM::ToolSearchResults (class)
+RubyLLM::ToolSearchResults include Support::Inspectable
+RubyLLM::ToolSearchResults#names (attr_reader)
+RubyLLM::ToolSearchResults.new(*tools)
 RubyLLM::Transcription (class)
 RubyLLM::Transcription include Accounting::Usage::ModelInfo
 RubyLLM::Transcription include Accounting::Usage::Result

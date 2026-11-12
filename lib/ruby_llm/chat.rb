@@ -713,7 +713,9 @@ module RubyLLM
     # Pass <tt>defer: true</tt> to keep the tools' definitions out of the
     # model's context until the provider's tool search loads the ones it
     # needs, or <tt>defer: false</tt> to offer a tool declared with
-    # Tool.defer up front. See #deferred_tools.
+    # Tool.defer up front. See #deferred_tools. A tool declared with
+    # Tool.searches_tools is never deferred: it is the search. Raises
+    # ArgumentError when a second one is registered.
     #
     #   chat.with_tools(*Catalog.tools, defer: true)
     #
@@ -739,8 +741,9 @@ module RubyLLM
           raise ArgumentError, "Two tools are named #{name}. Rename one with `tool :#{name}, as:`"
         end
 
+        check_tool_search(name, tool)
         @tools[name] = tool
-        @tool_deferrals[name] = defer.nil? ? tool.deferred? : defer
+        @tool_deferrals[name] = deferred_registration?(tool, defer)
       end
       self
     end
@@ -754,7 +757,7 @@ module RubyLLM
     # <tt>:crm_customer_lookup</tt>. Raises ArgumentError when two tools
     # share a key.
     def tools
-      offered = @tools.reject { |_, tool| hidden_from_model?(tool) }
+      offered = @tools.reject { |_, tool| hidden_from_model?(tool) || tool.searches_tools? }
       built_in = [@code_execution_tool, (@skill_loader if skills.any?), *@file_tools, tool_search_tool]
       [*built_in, *mcp.reachable_tools].compact.each_with_object(offered) do |tool, tools|
         next if hidden_from_model?(tool)
@@ -767,8 +770,10 @@ module RubyLLM
     end
 
     # Returns the tools whose definitions stay out of the model's context
-    # until the provider's tool search loads them, as a Hash like #tools.
-    # Providers without tool search receive them as ordinary tools.
+    # until the chat's tool search loads them, as a Hash like #tools. The
+    # search is the provider's own, a registered tool declared with
+    # Tool.searches_tools, or RubyLLM's +tool_search+ on a provider
+    # without one.
     #
     #   chat.with_tools(Weather).with_mcp(GitHub, defer: true)
     #   chat.deferred_tools.keys # => [:search_issues, :create_issue, ...]
@@ -2869,7 +2874,8 @@ module RubyLLM
       close = DidYouMean::SpellChecker.new(dictionary: tools.keys.map(&:to_s)).correct(name).first(3)
       message = "There is no tool named `#{name}`."
       message += " Did you mean #{close.map { |tool| "`#{tool}`" }.join(', ')}?" if close.any?
-      message += " Find tools with `#{Tools::Search.tool_name}`." if tool_search_tool
+      search = tool_search_tool
+      message += " Find tools with `#{search.name}`." if search
       message
     end
 
