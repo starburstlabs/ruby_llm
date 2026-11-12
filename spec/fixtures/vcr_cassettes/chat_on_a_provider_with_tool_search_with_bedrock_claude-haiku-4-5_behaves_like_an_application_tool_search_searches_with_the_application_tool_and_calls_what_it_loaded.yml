@@ -1,0 +1,181 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://bedrock-runtime.<AWS_REGION>.amazonaws.com/model/us.anthropic.claude-haiku-4-5-20251001-v1:0/invoke
+    body:
+      encoding: UTF-8
+      string: '{"messages":[{"role":"user","content":[{"type":"text","text":"First
+        search for an order lookup tool, then use it to check order 42. What is its
+        status?"}]}],"max_tokens":64000,"tools":[{"name":"lookup_order","description":"Looks
+        up an order","input_schema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"defer_loading":true},{"name":"find_tools","description":"Finds
+        tools for a task","input_schema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}}],"anthropic_version":"bedrock-2023-05-31","anthropic_beta":["tool-search-tool-2025-10-19"]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      Content-Type:
+      - application/json
+      X-Amz-Date:
+      - 20261112T142235Z
+      X-Amz-Content-Sha256:
+      - a34f89cf67ce28429fd27a3442445c786aa46401c0e0858a4099cf3b9ca4c97b
+      Authorization:
+      - AWS4-HMAC-SHA256 Credential=<AWS_ACCESS_KEY_ID>/<DATE>/<AWS_REGION>/bedrock/aws4_request,
+        SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=<AWS_SIGV4_SIGNATURE>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 12 Nov 2026 14:22:36 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '690'
+      Connection:
+      - keep-alive
+      X-Amzn-Requestid:
+      - 01d1b47e-cdde-44d5-83a5-ed4193195225
+      X-Amzn-Bedrock-Invocation-Latency:
+      - '878'
+      X-Amzn-Bedrock-Cache-Write-Input-Token-Count:
+      - '0'
+      X-Amzn-Bedrock-Cache-Read-Input-Token-Count:
+      - '0'
+      X-Amzn-Bedrock-Output-Token-Count:
+      - '75'
+      X-Amzn-Bedrock-Input-Token-Count:
+      - '591'
+    body:
+      encoding: UTF-8
+      string: '{"model":"anthropic.claude-haiku-4-5-20251001-v1:0","id":"msg_bdrk_rqruwtmfbd2pctjiuqoe3lkvstewqgnyf763ms7sexmroqs5hcmq","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        help you find an order lookup tool and then check the status of order 42."},{"type":"tool_use","id":"toolu_bdrk_015jg3qCT3QT1cxstotouYh3","name":"find_tools","input":{"query":"order
+        lookup tool"}}],"container":null,"stop_reason":"tool_use","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":591,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":75,"service_tier":"standard"}}'
+  recorded_at: Thu, 12 Nov 2026 14:22:36 GMT
+- request:
+    method: post
+    uri: https://bedrock-runtime.<AWS_REGION>.amazonaws.com/model/us.anthropic.claude-haiku-4-5-20251001-v1:0/invoke
+    body:
+      encoding: UTF-8
+      string: '{"messages":[{"role":"user","content":[{"type":"text","text":"First
+        search for an order lookup tool, then use it to check order 42. What is its
+        status?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll help
+        you find an order lookup tool and then check the status of order 42."},{"type":"tool_use","id":"toolu_bdrk_015jg3qCT3QT1cxstotouYh3","name":"find_tools","input":{"query":"order
+        lookup tool"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_bdrk_015jg3qCT3QT1cxstotouYh3","content":[{"type":"tool_reference","tool_name":"lookup_order"}]}]}],"max_tokens":64000,"tools":[{"name":"lookup_order","description":"Looks
+        up an order","input_schema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"defer_loading":true},{"name":"find_tools","description":"Finds
+        tools for a task","input_schema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}}],"anthropic_version":"bedrock-2023-05-31","anthropic_beta":["tool-search-tool-2025-10-19"]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      Content-Type:
+      - application/json
+      X-Amz-Date:
+      - 20261112T142236Z
+      X-Amz-Content-Sha256:
+      - 69812ca140e69bfc33045aac7b99e7616310bd9c5b20b72269b43312c271398a
+      Authorization:
+      - AWS4-HMAC-SHA256 Credential=<AWS_ACCESS_KEY_ID>/<DATE>/<AWS_REGION>/bedrock/aws4_request,
+        SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=<AWS_SIGV4_SIGNATURE>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 12 Nov 2026 14:22:37 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '690'
+      Connection:
+      - keep-alive
+      X-Amzn-Requestid:
+      - 11b237a5-3eb9-4d17-8ec9-92cbb72e6608
+      X-Amzn-Bedrock-Invocation-Latency:
+      - '796'
+      X-Amzn-Bedrock-Cache-Write-Input-Token-Count:
+      - '0'
+      X-Amzn-Bedrock-Cache-Read-Input-Token-Count:
+      - '0'
+      X-Amzn-Bedrock-Output-Token-Count:
+      - '79'
+      X-Amzn-Bedrock-Input-Token-Count:
+      - '756'
+    body:
+      encoding: UTF-8
+      string: '{"model":"anthropic.claude-haiku-4-5-20251001-v1:0","id":"msg_bdrk_ai5i4kibbc7trpxomcs47mwfnbjjvysbp77sh5uyeefyu7sqcnea","type":"message","role":"assistant","content":[{"type":"text","text":"Great!
+        I found the order lookup tool. Now let me use it to check the status of order
+        42."},{"type":"tool_use","id":"toolu_bdrk_01KoKaQkf8kgp7fs8xbWzt5h","name":"lookup_order","input":{"order_id":"42"}}],"container":null,"stop_reason":"tool_use","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":756,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":79,"service_tier":"standard"}}'
+  recorded_at: Thu, 12 Nov 2026 14:22:38 GMT
+- request:
+    method: post
+    uri: https://bedrock-runtime.<AWS_REGION>.amazonaws.com/model/us.anthropic.claude-haiku-4-5-20251001-v1:0/invoke
+    body:
+      encoding: UTF-8
+      string: '{"messages":[{"role":"user","content":[{"type":"text","text":"First
+        search for an order lookup tool, then use it to check order 42. What is its
+        status?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll help
+        you find an order lookup tool and then check the status of order 42."},{"type":"tool_use","id":"toolu_bdrk_015jg3qCT3QT1cxstotouYh3","name":"find_tools","input":{"query":"order
+        lookup tool"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_bdrk_015jg3qCT3QT1cxstotouYh3","content":[{"type":"tool_reference","tool_name":"lookup_order"}]}]},{"role":"assistant","content":[{"type":"text","text":"Great!
+        I found the order lookup tool. Now let me use it to check the status of order
+        42."},{"type":"tool_use","id":"toolu_bdrk_01KoKaQkf8kgp7fs8xbWzt5h","name":"lookup_order","input":{"order_id":"42"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_bdrk_01KoKaQkf8kgp7fs8xbWzt5h","content":[{"type":"text","text":"Order
+        42 shipped"}]}]}],"max_tokens":64000,"tools":[{"name":"lookup_order","description":"Looks
+        up an order","input_schema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true},"defer_loading":true},{"name":"find_tools","description":"Finds
+        tools for a task","input_schema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}}],"anthropic_version":"bedrock-2023-05-31","anthropic_beta":["tool-search-tool-2025-10-19"]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      Content-Type:
+      - application/json
+      X-Amz-Date:
+      - 20261112T142238Z
+      X-Amz-Content-Sha256:
+      - 270a9d87354af20507c57c54e38d4540c22f4d4d1252f7d6c3280f35e0fcd0f2
+      Authorization:
+      - AWS4-HMAC-SHA256 Credential=<AWS_ACCESS_KEY_ID>/<DATE>/<AWS_REGION>/bedrock/aws4_request,
+        SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=<AWS_SIGV4_SIGNATURE>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 12 Nov 2026 14:22:38 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '578'
+      Connection:
+      - keep-alive
+      X-Amzn-Requestid:
+      - f4255b0b-5108-4134-849f-671d58160f79
+      X-Amzn-Bedrock-Invocation-Latency:
+      - '614'
+      X-Amzn-Bedrock-Cache-Write-Input-Token-Count:
+      - '0'
+      X-Amzn-Bedrock-Cache-Read-Input-Token-Count:
+      - '0'
+      X-Amzn-Bedrock-Output-Token-Count:
+      - '27'
+      X-Amzn-Bedrock-Input-Token-Count:
+      - '852'
+    body:
+      encoding: UTF-8
+      string: '{"model":"anthropic.claude-haiku-4-5-20251001-v1:0","id":"msg_bdrk_5khwfpghilyekex3qfco5a2brfe4fqymcinivj5ovecssjf64tqq","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        status of order 42 is **shipped**. The order has been dispatched and is on
+        its way."}],"container":null,"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":852,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":27,"service_tier":"standard"}}'
+  recorded_at: Thu, 12 Nov 2026 14:22:39 GMT
+recorded_with: VCR 6.4.1

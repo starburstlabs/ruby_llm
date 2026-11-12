@@ -17,6 +17,10 @@ module RubyLLM
           tools.each_value.none? { |tool| tool.namespace == call.namespace }
         end
 
+        def complete(messages, tools:, **, &)
+          restore_search_calls(super, tools)
+        end
+
         def completion_url
           'responses'
         end
@@ -40,7 +44,7 @@ module RubyLLM
           # to ride back in the response. xAI only encrypts it when asked.
           payload = {
             model: model.id,
-            input: render_input(messages, caching:),
+            input: render_input(messages, caching:, tools:),
             instructions: render_instructions(messages, caching:),
             stream: stream,
             store: false,
@@ -53,10 +57,7 @@ module RubyLLM
           if tools.any?
             payload[:tools] = render_tools(tools)
             payload[:input] = namespace_searched_calls(payload[:input], tools)
-            unless tool_prefs[:choice].nil?
-              Protocol::ToolNamespaces.validate_tool_choice(tools, tool_prefs[:choice])
-              payload[:tool_choice] = build_tool_choice(tool_prefs[:choice])
-            end
+            payload[:tool_choice] = build_tool_choice(tool_prefs[:choice], tools) unless tool_prefs[:choice].nil?
             payload[:parallel_tool_calls] = tool_prefs[:calls] == :many unless tool_prefs[:calls].nil?
           end
 
@@ -140,7 +141,7 @@ module RubyLLM
         # with more reasoning items or phases than that only replays whole
         # from its raw items.
         def keep_raw_output?(output, server_tool_calls)
-          server_tool_calls.any? || output.any? { |item| namespaced_call?(item) } ||
+          server_tool_calls.any? || output.any? { |item| namespaced_call?(item) || client_search_call?(item) } ||
             output.count { |item| item['type'] == 'reasoning' } > 1 || message_phases(output).uniq.size > 1
         end
 
@@ -171,6 +172,39 @@ module RubyLLM
           item['type'] == 'function_call' && !item['namespace'].nil?
         end
 
+        def client_search_call?(item)
+          item.is_a?(Hash) && item['type'] == 'tool_search_call' && item['execution'] == 'client'
+        end
+
+        # A client search call comes back without a name.
+        def parse_search_calls(output, response: nil, finish_reason: nil)
+          calls = output.select { |item| client_search_call?(item) }.map do |item|
+            ToolCall.new(provider_call_id: item.fetch('call_id'), name: RubyLLM::Tools::Search.tool_name,
+                         **ToolCall.parse_arguments(item['arguments'], response:, finish_reason:))
+          end
+          ToolCall.index(calls, by: :provider_call_id)
+        end
+
+        def restore_search_calls(message, tools)
+          search = RubyLLM::Tools::Search.declared(tools)
+          return message unless search && message.is_a?(Message)
+
+          searched = replayed_search_call_ids(message.raw_content)
+          return message if searched.empty?
+
+          message.with_tool_calls(message.tool_calls.transform_values do |call|
+            next call unless searched.include?(call.provider_call_id)
+
+            rebuild_tool_call(call, name: search.name, namespace: search.namespace)
+          end)
+        end
+
+        def replayed_search_call_ids(raw)
+          return [] unless raw.is_a?(Array)
+
+          raw.filter_map { |item| item['call_id'] if client_search_call?(item) }
+        end
+
         def portable_raw_content(message)
           items = message.raw_content
           return unless items.is_a?(Array)
@@ -184,7 +218,8 @@ module RubyLLM
         # provider-executed tool steps (web_search_call, code_interpreter_call,
         # and whatever OpenAI ships next). They are kept raw and replayed.
         def parse_server_tool_items(output)
-          output.reject { |item| CLIENT_OUTPUT_ITEM_TYPES.include?(item['type']) }.map do |item|
+          items = output.reject { |item| CLIENT_OUTPUT_ITEM_TYPES.include?(item['type']) || client_search_call?(item) }
+          items.map do |item|
             ServerToolCall.new(
               type: item['type'],
               name: item['name'],
@@ -374,7 +409,7 @@ module RubyLLM
           system.map { |msg| msg.content.to_s }.join("\n\n")
         end
 
-        def render_input(messages, caching: nil)
+        def render_input(messages, caching: nil, tools: {})
           system, conversation = messages.partition { |msg| msg.role == :system }
           system_items = if system_input_items?(system, caching:)
                            system.flat_map { |msg| [render_item(msg, caching:)].flatten(1) }
@@ -382,17 +417,26 @@ module RubyLLM
                            []
                          end
 
-          system_items + render_conversation(conversation, caching:)
+          system_items + render_conversation(conversation, caching:, tools:)
         end
 
-        def render_conversation(messages, caching: nil)
+        def render_conversation(messages, caching: nil, tools: {})
+          search_call_ids = client_search_call_ids(messages, tools)
           messages.each_with_object([]) do |message, input|
             raw = message.raw_content
             if raw.is_a?(Hash) && raw['object'] == 'response.compaction'
               input.replace(raw.fetch('output'))
             else
-              input.concat([render_item(message, caching:)].flatten(1))
+              input.concat([render_item(message, caching:, tools:, search_call_ids:)].flatten(1))
             end
+          end
+        end
+
+        def client_search_call_ids(messages, tools)
+          searching = RubyLLM::Tools::Search.declared(tools)
+          messages.select { |msg| msg.role == :assistant }.flat_map do |msg|
+            calls = searching ? msg.tool_calls.select { |call| RubyLLM::Tools::Search.search?(call, tools) } : []
+            replayed_search_call_ids(msg.raw_content) | calls.map(&:provider_call_id)
           end
         end
 
@@ -404,15 +448,15 @@ module RubyLLM
           msg.role == :system && ((caching != false && msg.cache_until_here?) || msg.attachments.any?)
         end
 
-        def render_item(msg, caching: nil)
+        def render_item(msg, caching: nil, tools: {}, search_call_ids: [])
           case msg.role
           when :system
             item = { role: 'system', content: render_content(msg.content, msg.attachments) }
             caching != false && msg.cache_until_here? ? inject_cache_breakpoint(item) : item
           when :tool
-            render_tool_items(msg)
+            render_tool_items(msg, tools:, search_call_ids:)
           when :assistant
-            render_assistant_items(msg)
+            render_assistant_items(msg, search_call_ids:)
           else
             item = { role: 'user', content: render_content(msg.content, msg.attachments) }
             caching != false && msg.cache_until_here? ? inject_cache_breakpoint(item) : item
@@ -436,8 +480,9 @@ module RubyLLM
 
         # Function call outputs are text-only on the wire, so tool attachments
         # ride a user item spliced in right after the result.
-        def render_tool_items(msg)
+        def render_tool_items(msg, tools: {}, search_call_ids: [])
           return msg.raw_content if msg.raw_content
+          return render_search_output_items(msg, tools) if search_call_ids.include?(msg.provider_call_id)
 
           items = [{
             type: 'function_call_output',
@@ -452,6 +497,24 @@ module RubyLLM
           items
         end
 
+        # A tool_search_output carries only tool definitions, so any other
+        # text the search returned rides a user item after it.
+        def render_search_output_items(msg, tools)
+          results = RubyLLM::ToolSearchResults.from_content(msg.content)
+          items = [{ type: 'tool_search_output', execution: 'client', call_id: msg.provider_call_id,
+                     status: 'completed', tools: render_tools(results ? results.within(tools) : {}) }]
+          items << render_text_item("Result of tool search #{msg.provider_call_id}:", msg.content) unless results
+          if msg.attachments.any?
+            items << render_attachment_item("Attachments from tool call #{msg.provider_call_id}:", msg.attachments)
+          end
+          items
+        end
+
+        def render_text_item(label, text)
+          text = '(no output)' if text.to_s.strip.empty?
+          { role: 'user', content: [{ type: 'input_text', text: label }, { type: 'input_text', text: }] }
+        end
+
         def render_attachment_item(label, attachments)
           parts = [{ type: 'input_text', text: label }]
           parts.concat(render_content(nil, attachments))
@@ -460,15 +523,15 @@ module RubyLLM
 
         # Assistant output is text-only on the wire, so the attachments of a
         # replayed assistant turn ride a user item spliced in after it.
-        def render_assistant_items(msg)
+        def render_assistant_items(msg, search_call_ids: [])
           # Turns that used server tools replay their output items verbatim,
           # reasoning and tool results included, as stateless chaining expects.
-          return replayed_output(msg) if msg.raw_content
+          return render_replayed_items(msg, search_call_ids) if msg.raw_content
 
           items = []
           items << render_reasoning_item(msg.thinking) if own_signature(msg)
           items << render_output_item(msg) unless empty_content?(msg.content)
-          items.concat(render_function_call_items(msg.tool_calls)) if msg.tool_call?
+          items.concat(render_function_call_items(msg.tool_calls, search_call_ids:)) if msg.tool_call?
           items << render_attachment_item('Attachments from the assistant:', msg.attachments) if msg.attachments.any?
           items
         end
@@ -481,13 +544,27 @@ module RubyLLM
           }
         end
 
+        def render_replayed_items(msg, search_call_ids)
+          items = replayed_output(msg)
+          return items unless items.is_a?(Array)
+
+          calls = msg.tool_calls.select { |call| search_call_ids.include?(call.provider_call_id) }
+                     .to_h { |call| [call.provider_call_id, call] }
+          items.map do |item|
+            call = calls[item['call_id']] if item.is_a?(Hash) && item['type'] == 'function_call'
+            call ? render_search_call_item(call) : item
+          end
+        end
+
         def replayed_output(msg)
           Protocol::ReplayedArguments.blank(msg.raw_content, msg,
                                             id: %w[call_id id], arguments: 'arguments', empty: '{}')
         end
 
-        def render_function_call_items(tool_calls)
+        def render_function_call_items(tool_calls, search_call_ids: [])
           tool_calls.map do |tc|
+            next render_search_call_item(tc) if search_call_ids.include?(tc.provider_call_id)
+
             {
               type: 'function_call',
               call_id: tc.provider_call_id,
@@ -496,6 +573,11 @@ module RubyLLM
               arguments: JSON.generate(tc.arguments)
             }.compact
           end
+        end
+
+        def render_search_call_item(tool_call)
+          { type: 'tool_search_call', execution: 'client', call_id: tool_call.provider_call_id, status: 'completed',
+            arguments: tool_call.arguments }
         end
 
         def render_output_item(msg)

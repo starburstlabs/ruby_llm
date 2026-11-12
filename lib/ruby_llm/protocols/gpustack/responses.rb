@@ -40,10 +40,11 @@ module RubyLLM
           super(payload, merge_mcp_filters(tools))
         end
 
-        def render_assistant_items(message)
+        def render_assistant_items(message, **)
           super.flat_map do |item|
             data = Support::Utils.deep_symbolize_keys(item)
             next item unless data[:type] && !Protocols::Responses::Chat::CLIENT_OUTPUT_ITEM_TYPES.include?(data[:type])
+            next item if client_search_call?(item.transform_keys(&:to_s))
 
             render_server_tool_history(data)
           end

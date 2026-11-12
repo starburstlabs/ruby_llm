@@ -24,7 +24,8 @@ module RubyLLM
 
         def parse_pending_tool_calls(output, response: nil, finish_reason: nil)
           calls = (parse_function_calls(output, response:, finish_reason:) || {}).values +
-                  parse_tool_approvals(output, response:, finish_reason:).values
+                  parse_tool_approvals(output, response:, finish_reason:).values +
+                  parse_search_calls(output, response:, finish_reason:).values
           ToolCall.index(calls, by: :provider_call_id) unless calls.empty?
         end
       end

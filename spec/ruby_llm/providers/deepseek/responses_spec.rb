@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../../../support/application_tool_search_helpers'
 
 RSpec.describe RubyLLM::Providers::DeepSeek::Responses do
   let(:protocol) { described_class.allocate }
@@ -128,6 +129,26 @@ RSpec.describe RubyLLM::Providers::DeepSeek::Responses do
     message = protocol.send(:parse_completion_body, { 'status' => 'completed', 'output' => output }, raw: output)
 
     expect(render([message])[:input]).to eq(output)
+  end
+
+  context 'with an application tool search' do
+    include_context 'with application tool search'
+
+    it 'answers a replayed client search call with the definitions it loaded' do
+      tools = { find_tools: finder, lookup_order: RubyLLM::Tool::Deferred.new(target) }
+      messages = [pending_search_message(raw: [client_search_item]), search_result_message]
+
+      input = protocol.send(:render_payload, messages, tools:, temperature: nil, model:)[:input]
+
+      expect(input).to eq([
+                            client_search_item,
+                            { type: 'tool_search_output', execution: 'client', call_id: 'search_1',
+                              status: 'completed',
+                              tools: [{ type: 'function', name: 'lookup_order', description: 'Looks up an order',
+                                        parameters: target.parameters_schema, strict: false,
+                                        defer_loading: true }] }
+                          ])
+    end
   end
 
   it 'continues a streamed reasoning conversation after a tool result', :live do

@@ -27,17 +27,25 @@ module RubyLLM
         end
 
         def render_tools(tools)
-          ordinary, namespaced = tools.values.partition { |tool| tool.namespace.nil? }
-          groups = namespaced.group_by(&:namespace).map do |namespace, members|
-            if RESERVED_NAMESPACES.include?(namespace)
-              raise Error, "The namespace \"#{namespace}\" is reserved by the Responses API, which drops its " \
-                           'functions; choose another namespace'
-            end
+          search = RubyLLM::Tools::Search.declared(tools)
+          ordinary, namespaced = tools.values.partition { |tool| tool.namespace.nil? || tool.equal?(search) }
+          groups = namespaced.group_by(&:namespace).map { |namespace, members| render_namespace(namespace, members) }
+          ordinary.map { |tool| tool.equal?(search) ? render_search_declaration(tool) : tool_for(tool) } + groups
+        end
 
-            { type: 'namespace', name: namespace, description: members.filter_map(&:namespace_description).first,
-              tools: members.map { |tool| tool_for(tool) } }.compact
+        def render_namespace(namespace, members)
+          if RESERVED_NAMESPACES.include?(namespace)
+            raise Error, "The namespace \"#{namespace}\" is reserved by the Responses API, which drops its " \
+                         'functions; choose another namespace'
           end
-          ordinary.map { |tool| tool_for(tool) } + groups
+
+          { type: 'namespace', name: namespace, description: members.filter_map(&:namespace_description).first,
+            tools: members.map { |tool| tool_for(tool) } }.compact
+        end
+
+        def render_search_declaration(tool)
+          { type: NATIVE_TOOL_SEARCH[:type], execution: 'client', description: tool.description,
+            parameters: ChatCompletions::Tools.parameters_schema_for(tool) }
         end
 
         def deferred?(tool)
@@ -96,11 +104,15 @@ module RubyLLM
           (tool[:type] || tool['type']) == NATIVE_TOOL_SEARCH[:type]
         end
 
-        def build_tool_choice(tool_choice)
+        def build_tool_choice(tool_choice, tools = {})
+          search = RubyLLM::Tools::Search.declared(tools)
+          return { type: NATIVE_TOOL_SEARCH[:type] } if search && tool_choice == search.qualified_name.to_sym
+
           case tool_choice
           when :auto, :none, :required
             tool_choice
           else
+            Protocol::ToolNamespaces.validate_tool_choice(tools, tool_choice)
             {
               type: 'function',
               name: tool_choice

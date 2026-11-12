@@ -83,11 +83,12 @@ module RubyLLM
 
         # Perplexity rejects its own search_results and fetch_url_results
         # items as input, so a replayed turn keeps only messages, reasoning,
-        # and function calls.
-        def render_assistant_items(msg)
+        # function calls, and client tool searches.
+        def render_assistant_items(msg, **)
           super.select do |item|
             type = item[:type] || item['type']
-            type.nil? || Responses::Chat::CLIENT_OUTPUT_ITEM_TYPES.include?(type)
+            type.nil? || Responses::Chat::CLIENT_OUTPUT_ITEM_TYPES.include?(type) ||
+              client_search_call?(item.transform_keys(&:to_s))
           end
         end
 

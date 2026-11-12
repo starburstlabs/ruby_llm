@@ -147,10 +147,13 @@ module RubyLLM
           response = data['response'] || {}
           output = response['output'] || []
           server_tool_calls = parse_server_tool_items(output)
+          finish_reason = parse_finish_reason(response)
+          final_calls = parse_tool_approvals(output, finish_reason:).values +
+                        parse_search_calls(output, finish_reason:).values
 
           chunk model: response['model'],
-                tool_calls: parse_tool_approvals(output, finish_reason: parse_finish_reason(response)),
-                finish_reason: parse_finish_reason(response),
+                tool_calls: ToolCall.index(final_calls, by: :provider_call_id),
+                finish_reason: finish_reason,
                 content_filters: ChatCompletions::ContentFilters.parse_content_filters(response),
                 citations: parse_citations(response, output, nil),
                 server_tool_calls: server_tool_calls,

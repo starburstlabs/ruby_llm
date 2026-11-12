@@ -38,7 +38,7 @@ module RubyLLM
 
         # Kimi silently drops the web_search tool for a message whose content
         # is a bare string, so text always travels as input_text parts.
-        def render_item(msg, caching: nil)
+        def render_item(msg, caching: nil, **)
           item = super
           return item unless item.is_a?(Hash) && item[:role] && item[:content].is_a?(String)
 

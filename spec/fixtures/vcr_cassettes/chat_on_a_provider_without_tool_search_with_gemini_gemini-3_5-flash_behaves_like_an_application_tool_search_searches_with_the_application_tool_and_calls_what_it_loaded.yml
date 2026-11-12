@@ -1,0 +1,274 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"First search for an order
+        lookup tool, then use it to check order 42. What is its status?"}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"find_tools","description":"Finds
+        tools for a task","parametersJsonSchema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Gemini-Service-Tier:
+      - standard
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 12 Nov 2026 15:29:46 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1231
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "functionCall": {
+                      "name": "find_tools",
+                      "args": {
+                        "query": "order lookup"
+                      },
+                      "id": "call_10596778296654084991"
+                    },
+                    "thoughtSignature": "EugDCuUDAWkUfRMl9/+j0qWuDblNPGSY/JXfhJsvGR87qEygKSuFzyyCEbxTeNX0d7S3rZ5+FlhbDOHhkDGejQ97Xa3jYfiiYKKMIjSkvz4uCINGng08NVDpqjXnXBEHWgB56zcj65SgN3M3ftBP9IOIgYsVOHK85F8VgX9hO39Qeb6a89W9RTG7H9iOn8iX21tlxIotC0zgTtAPrtWihHBU0EDHxsekf70h/wgh2l9s/OkIPHso7HnLoU9Nu03VzETa12p4qxS+QJxBLEf+MLQyzNG0j4CTi0p+P5JMfMv2mvVkZEQqDsgWl9ne90hXj98JFY50aMoGqdnQad9BZihilT9N91JebnDgi7G/JKoBXve0r7vgLNUCqyW+jE+Vfh9EwP/eAibe5bnPJ9qDUkI7MWGZaITvK/oClCLOouxQTzNt6iqlLgko7U6jYiQVAbyfogWVlL4bN0Y5fi03FEcFtPW3sI4rO395YFWcP43pULSeB/4mVG/t1BFlqyG29xDrFSnbSBYWwxH3N4vf2/WEhe1ihnay7Rf0WEq1VD7AeTkVxDNo7I+/F7EySTodm5HNDr0WpN3Fs+hNuMGoHFw/6KKT7Ly4T5C6BaigsCgr5i224YZb46qQZBp8Y4jeNkVEKSlFX27sg0U="
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0,
+              "finishMessage": "Model generated function call(s)."
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 67,
+            "candidatesTokenCount": 17,
+            "totalTokenCount": 191,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 67
+              }
+            ],
+            "thoughtsTokenCount": 107,
+            "serviceTier": "standard"
+          },
+          "modelVersion": "gemini-3.6-flash",
+          "responseId": "aNv1aqT1NK20qtsP94aduAo"
+        }
+  recorded_at: Thu, 12 Nov 2026 15:29:46 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"First search for an order
+        lookup tool, then use it to check order 42. What is its status?"}]},{"role":"model","parts":[{"functionCall":{"name":"find_tools","args":{"query":"order
+        lookup"}},"thoughtSignature":"EugDCuUDAWkUfRMl9/+j0qWuDblNPGSY/JXfhJsvGR87qEygKSuFzyyCEbxTeNX0d7S3rZ5+FlhbDOHhkDGejQ97Xa3jYfiiYKKMIjSkvz4uCINGng08NVDpqjXnXBEHWgB56zcj65SgN3M3ftBP9IOIgYsVOHK85F8VgX9hO39Qeb6a89W9RTG7H9iOn8iX21tlxIotC0zgTtAPrtWihHBU0EDHxsekf70h/wgh2l9s/OkIPHso7HnLoU9Nu03VzETa12p4qxS+QJxBLEf+MLQyzNG0j4CTi0p+P5JMfMv2mvVkZEQqDsgWl9ne90hXj98JFY50aMoGqdnQad9BZihilT9N91JebnDgi7G/JKoBXve0r7vgLNUCqyW+jE+Vfh9EwP/eAibe5bnPJ9qDUkI7MWGZaITvK/oClCLOouxQTzNt6iqlLgko7U6jYiQVAbyfogWVlL4bN0Y5fi03FEcFtPW3sI4rO395YFWcP43pULSeB/4mVG/t1BFlqyG29xDrFSnbSBYWwxH3N4vf2/WEhe1ihnay7Rf0WEq1VD7AeTkVxDNo7I+/F7EySTodm5HNDr0WpN3Fs+hNuMGoHFw/6KKT7Ly4T5C6BaigsCgr5i224YZb46qQZBp8Y4jeNkVEKSlFX27sg0U="}]},{"role":"user","parts":[{"functionResponse":{"name":"find_tools","response":{"name":"find_tools","content":[{"text":"{\"loaded\":[\"lookup_order\"]}"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"find_tools","description":"Finds
+        tools for a task","parametersJsonSchema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"name":"lookup_order","description":"Looks
+        up an order","parametersJsonSchema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Gemini-Service-Tier:
+      - standard
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 12 Nov 2026 15:29:52 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=6390
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "functionCall": {
+                      "name": "lookup_order",
+                      "args": {
+                        "order_id": "42"
+                      },
+                      "id": "call_16927088217788766907"
+                    },
+                    "thoughtSignature": "EtEBCs4BAWkUfRPMPmPjdjUUz0FkIn8vm5674CD761T0oX5RTRdhTPduaxKS0SRUW7DbgbwIZL5USfO0cBpirjg66RkQ9UowZXoE7ZraAWxFG82kc4MCb2Hj8KTb5NwzDrSvtQNHg38G9RPcttIKnyyYqTpd8pvZGBp6y15a1vXhjjxb7GDlB6NdGaHxsGGXKrtbOO+k+uSEyvuA+tSdC1aXRXJNOA8z3RfcVtbbuYlf8rNWlKn8fiw/pBpQ+cueZiRq8dsJvYXtO5MYQq5jL7pYrIM="
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0,
+              "finishMessage": "Model generated function call(s)."
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 267,
+            "candidatesTokenCount": 19,
+            "totalTokenCount": 321,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 267
+              }
+            ],
+            "thoughtsTokenCount": 35,
+            "serviceTier": "standard"
+          },
+          "modelVersion": "gemini-3.6-flash",
+          "responseId": "atv1atCzIv6tqtsPqPDWiAs"
+        }
+  recorded_at: Thu, 12 Nov 2026 15:29:52 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"First search for an order
+        lookup tool, then use it to check order 42. What is its status?"}]},{"role":"model","parts":[{"functionCall":{"name":"find_tools","args":{"query":"order
+        lookup"}},"thoughtSignature":"EugDCuUDAWkUfRMl9/+j0qWuDblNPGSY/JXfhJsvGR87qEygKSuFzyyCEbxTeNX0d7S3rZ5+FlhbDOHhkDGejQ97Xa3jYfiiYKKMIjSkvz4uCINGng08NVDpqjXnXBEHWgB56zcj65SgN3M3ftBP9IOIgYsVOHK85F8VgX9hO39Qeb6a89W9RTG7H9iOn8iX21tlxIotC0zgTtAPrtWihHBU0EDHxsekf70h/wgh2l9s/OkIPHso7HnLoU9Nu03VzETa12p4qxS+QJxBLEf+MLQyzNG0j4CTi0p+P5JMfMv2mvVkZEQqDsgWl9ne90hXj98JFY50aMoGqdnQad9BZihilT9N91JebnDgi7G/JKoBXve0r7vgLNUCqyW+jE+Vfh9EwP/eAibe5bnPJ9qDUkI7MWGZaITvK/oClCLOouxQTzNt6iqlLgko7U6jYiQVAbyfogWVlL4bN0Y5fi03FEcFtPW3sI4rO395YFWcP43pULSeB/4mVG/t1BFlqyG29xDrFSnbSBYWwxH3N4vf2/WEhe1ihnay7Rf0WEq1VD7AeTkVxDNo7I+/F7EySTodm5HNDr0WpN3Fs+hNuMGoHFw/6KKT7Ly4T5C6BaigsCgr5i224YZb46qQZBp8Y4jeNkVEKSlFX27sg0U="}]},{"role":"user","parts":[{"functionResponse":{"name":"find_tools","response":{"name":"find_tools","content":[{"text":"{\"loaded\":[\"lookup_order\"]}"}]}}}]},{"role":"model","parts":[{"functionCall":{"name":"lookup_order","args":{"order_id":"42"}},"thoughtSignature":"EtEBCs4BAWkUfRPMPmPjdjUUz0FkIn8vm5674CD761T0oX5RTRdhTPduaxKS0SRUW7DbgbwIZL5USfO0cBpirjg66RkQ9UowZXoE7ZraAWxFG82kc4MCb2Hj8KTb5NwzDrSvtQNHg38G9RPcttIKnyyYqTpd8pvZGBp6y15a1vXhjjxb7GDlB6NdGaHxsGGXKrtbOO+k+uSEyvuA+tSdC1aXRXJNOA8z3RfcVtbbuYlf8rNWlKn8fiw/pBpQ+cueZiRq8dsJvYXtO5MYQq5jL7pYrIM="}]},{"role":"user","parts":[{"functionResponse":{"name":"lookup_order","response":{"name":"lookup_order","content":[{"text":"Order
+        42 shipped"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"find_tools","description":"Finds
+        tools for a task","parametersJsonSchema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"name":"lookup_order","description":"Looks
+        up an order","parametersJsonSchema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Gemini-Service-Tier:
+      - standard
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 12 Nov 2026 15:29:53 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=780
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "The status of order 42 is **shipped**.",
+                    "thoughtSignature": "Ep8CCpwCAWkUfRPMMBsB2CcqRxvaFtMn/7rpC+BmCIFG8c7wXqFEbP+6U0tkFZl1vC+s+1PcHuUpe/U/Ay5pd0ZxDhxZuI5EqyPSp2x6lclnYYQji75VWtDF46Vlh0CP4s437x1k5Z9iH4vYGUgt2H0jczlSrmqMQVFxVXs0vWE8zDShAKSvM4C6dO1t/jXOXObwgBHQ29lr+0kFQSPIQ2Ngld7wWNJrNIDGCBLN8iKzDP9v9lp1kmN6eULbN7xNy8gaZtJhequ3okWD5LzdADXpZbDTR00ATD7TyeSTK25j0YpY0dYoZ7G3lf/inTYoe0VkwMpZn3/mo1srYLU25sMFzivaaDOigQ3RkR9b6aB2e12Q0Qra/aPJSi7f8xLwtkw="
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 350,
+            "candidatesTokenCount": 12,
+            "totalTokenCount": 403,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 350
+              }
+            ],
+            "thoughtsTokenCount": 41,
+            "serviceTier": "standard"
+          },
+          "modelVersion": "gemini-3.6-flash",
+          "responseId": "cdv1asj0CvWFz7IPsfvnkAk"
+        }
+  recorded_at: Thu, 12 Nov 2026 15:29:53 GMT
+recorded_with: VCR 6.4.1

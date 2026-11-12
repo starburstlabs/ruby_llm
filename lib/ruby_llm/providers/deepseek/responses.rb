@@ -50,7 +50,7 @@ module RubyLLM
           texts.empty? ? super : texts.join("\n")
         end
 
-        def render_assistant_items(message)
+        def render_assistant_items(message, **)
           items = super
           return items if message.raw_content || message.thinking&.text.to_s.empty? || message.thinking.signature
 
@@ -61,7 +61,9 @@ module RubyLLM
           { type: 'reasoning', content: [{ type: 'reasoning_text', text: thinking.text }] }
         end
 
-        def render_tool_items(message)
+        def render_tool_items(message, search_call_ids: [], **)
+          return super if search_call_ids.include?(message.provider_call_id)
+
           [{
             type: 'function_call_output',
             call_id: message.provider_call_id,

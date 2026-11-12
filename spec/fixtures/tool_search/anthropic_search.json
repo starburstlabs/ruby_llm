@@ -1,0 +1,21 @@
+{
+  "id": "msg_search",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-haiku-4-5",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "search_1",
+      "name": "find_tools",
+      "input": {
+        "query": "orders"
+      }
+    }
+  ],
+  "stop_reason": "tool_use",
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 3
+  }
+}

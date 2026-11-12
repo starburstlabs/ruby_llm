@@ -376,6 +376,7 @@ TEST_MODELS = {
   agentic_video: [{ provider: :gemini, model: 'gemini-3.5-flash-lite' }],
   client_toolset: [{ provider: :anthropic, model: 'claude-sonnet-5' }],
   tool_namespace: [{ provider: :openai, model: 'gpt-5.4' }],
+  application_tool_search: [{ provider: :gemini, model: 'gemini-3.5-flash' }],
   provider_tools: [
     { provider: :gemini, model: 'gemini-3.5-flash' },
     { provider: :openrouter, model: 'openai/gpt-5.2' },

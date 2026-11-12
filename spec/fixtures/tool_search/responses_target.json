@@ -1,0 +1,16 @@
+{
+  "model": "gpt-5.4",
+  "status": "completed",
+  "output": [
+    {
+      "type": "function_call",
+      "call_id": "order_1",
+      "name": "lookup_order",
+      "arguments": "{\"order_id\":\"42\"}"
+    }
+  ],
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 3
+  }
+}

@@ -1,0 +1,202 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:streamGenerateContent?alt=sse
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"First search for an order
+        lookup tool, then use it to check order 42. What is its status?"}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"find_tools","description":"Finds
+        tools for a task","parametersJsonSchema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/event-stream
+      Content-Disposition:
+      - attachment
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Transfer-Encoding:
+      - chunked
+      Date:
+      - Thu, 12 Nov 2026 15:31:15 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=81782
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: "data: {\"candidates\": [{\"content\": {\"parts\": [{\"functionCall\":
+        {\"name\": \"find_tools\",\"args\": {\"query\": \"order lookup\"},\"id\":
+        \"call_4446204044435605363\"},\"thoughtSignature\": \"EvMECvAEAWkUfROCpXKfV7PqADprbeXconrpbh2XCetTzWPxwGJ63Q1lCwKf/xvTxrewL8mhPUSh8S5gFazH1FMr0KMykMv5AMouj+c7tuSU1V+Eh4FtuwarE7OKryEtqYbDxfBoUk+US94CPR/WjqLeq32yVFVh40KdXf/QLE39P4aqfPbN8THokmQPBYzq8ARADVO9fpcKstlmvXZdN6TuoG2+4QsiouO2lDpwMRXXRxVsZ5gKm1qSj+Akm6JfNLOncfd3nl8rC/fALqFGa0OcFwAFzMEXd4A5Ydaupx3zZXsvZVnvYtlYSEhgLLpQIikNhXnx9/BwiAtqOat0dCdq3hXxyJd2pXUsQVcaMlqTKi6O6DIMMairv+M4UrTZqyYRILz3cwrr8NVC44wZKwOTODLMvor2o1YbM7r1VpD4XSBBo4SR4aF316qkYRWVx9ZaciOFNMCDzpISpUTtabzzn3PP6ClemqoShhdWJ8b4EIl/NnQBqi1ZWFyjzr2L5/wpXHQYXug9gKjJeD8UmsQ5tx0q+pTGhhJHL/jCimeDzeahRgaOpilc9OQWYClxbFkklEtY/dNSnNay7SEfXajEx0YqxlW5lTLIDY0gWAmPuRUpeTFQW7FTk3hqxHGDPzx0o8q/dbyHZzodYV3v8t3EvK7Y1yePQZ9RrG3KgzY+jnEdE46LZBDB/JT/7oFfA+G0tik7oOn/jA+MaLQ/lZ+YHrNpFE6HxRvtoVkecQmsu/5EKiUngKkdgC9ICgMiuhC1lgdeZ0vUjOfq4BjORGMQZtuwGR2iJdmQtQtuNPY/6sftduxzOzYwmezZJtrPK1OtCEK1\"}],\"role\":
+        \"model\"},\"index\": 0}],\"usageMetadata\": {\"promptTokenCount\": 67,\"candidatesTokenCount\":
+        17,\"totalTokenCount\": 212,\"promptTokensDetails\": [{\"modality\": \"TEXT\",\"tokenCount\":
+        67}],\"thoughtsTokenCount\": 128,\"serviceTier\": \"standard\"},\"modelVersion\":
+        \"gemini-3.6-flash\",\"responseId\": \"ctv1atyZBrjQz7IPtLqI0Ac\"}\r\n\r\ndata:
+        {\"candidates\": [{\"content\": {\"parts\": [{\"text\": \"\"}],\"role\": \"model\"},\"finishReason\":
+        \"STOP\",\"index\": 0}],\"usageMetadata\": {\"promptTokenCount\": 67,\"candidatesTokenCount\":
+        17,\"totalTokenCount\": 212,\"promptTokensDetails\": [{\"modality\": \"TEXT\",\"tokenCount\":
+        67}],\"thoughtsTokenCount\": 128,\"serviceTier\": \"standard\"},\"modelVersion\":
+        \"gemini-3.6-flash\",\"responseId\": \"ctv1atyZBrjQz7IPtLqI0Ac\"}\r\n\r\n"
+  recorded_at: Thu, 12 Nov 2026 15:31:16 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:streamGenerateContent?alt=sse
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"First search for an order
+        lookup tool, then use it to check order 42. What is its status?"}]},{"role":"model","parts":[{"functionCall":{"name":"find_tools","args":{"query":"order
+        lookup"}},"thoughtSignature":"EvMECvAEAWkUfROCpXKfV7PqADprbeXconrpbh2XCetTzWPxwGJ63Q1lCwKf/xvTxrewL8mhPUSh8S5gFazH1FMr0KMykMv5AMouj+c7tuSU1V+Eh4FtuwarE7OKryEtqYbDxfBoUk+US94CPR/WjqLeq32yVFVh40KdXf/QLE39P4aqfPbN8THokmQPBYzq8ARADVO9fpcKstlmvXZdN6TuoG2+4QsiouO2lDpwMRXXRxVsZ5gKm1qSj+Akm6JfNLOncfd3nl8rC/fALqFGa0OcFwAFzMEXd4A5Ydaupx3zZXsvZVnvYtlYSEhgLLpQIikNhXnx9/BwiAtqOat0dCdq3hXxyJd2pXUsQVcaMlqTKi6O6DIMMairv+M4UrTZqyYRILz3cwrr8NVC44wZKwOTODLMvor2o1YbM7r1VpD4XSBBo4SR4aF316qkYRWVx9ZaciOFNMCDzpISpUTtabzzn3PP6ClemqoShhdWJ8b4EIl/NnQBqi1ZWFyjzr2L5/wpXHQYXug9gKjJeD8UmsQ5tx0q+pTGhhJHL/jCimeDzeahRgaOpilc9OQWYClxbFkklEtY/dNSnNay7SEfXajEx0YqxlW5lTLIDY0gWAmPuRUpeTFQW7FTk3hqxHGDPzx0o8q/dbyHZzodYV3v8t3EvK7Y1yePQZ9RrG3KgzY+jnEdE46LZBDB/JT/7oFfA+G0tik7oOn/jA+MaLQ/lZ+YHrNpFE6HxRvtoVkecQmsu/5EKiUngKkdgC9ICgMiuhC1lgdeZ0vUjOfq4BjORGMQZtuwGR2iJdmQtQtuNPY/6sftduxzOzYwmezZJtrPK1OtCEK1"}]},{"role":"user","parts":[{"functionResponse":{"name":"find_tools","response":{"name":"find_tools","content":[{"text":"{\"loaded\":[\"lookup_order\"]}"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"find_tools","description":"Finds
+        tools for a task","parametersJsonSchema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"name":"lookup_order","description":"Looks
+        up an order","parametersJsonSchema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/event-stream
+      Content-Disposition:
+      - attachment
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Transfer-Encoding:
+      - chunked
+      Date:
+      - Thu, 12 Nov 2026 15:31:19 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1205
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: "data: {\"candidates\": [{\"content\": {\"parts\": [{\"functionCall\":
+        {\"name\": \"lookup_order\",\"args\": {\"order_id\": \"42\"},\"id\": \"call_10830123534084296523\"},\"thoughtSignature\":
+        \"Ev4DCvsDAWkUfROuzIqM6xo3O2YQaS7DArIH2kViknYMyS8DdZxuKqlrqLK0ubp4jpnk+9tOXdzvyLVIO8kjZ5yRuOIoHDfSrNjUKiwUEr+2naFlI0F8+UCvDR/wo108pSPxWca9txqG510a1MeO1kJDVXyPzWfS5DBNwIpD4zQmokr11U7ZsBpMUQQDJnfQ/CVpzENSbSqmxF3tGCuRVSDJYjx9XV+IgAcX40EVOIjpepF9X3ikfqsKMgyXXTOzH5aB3cI86/3AwDyhumOo0BkVyH/zfAFoPVeuuDI1o0O5wQdcFBZ7FD1kJc5GF65t5kZGbKxOZtZ6RGu8m7cfaUkUZ0eCIQT2mNa7+REbYvb3meSzf0v2paw9y+B2DxL7x46/JnFJ/c1xHlEimc0ASHQ8BVe73cldR+43Sym4pc7ntg8SnEdGYsezcUojbWwOuusWexWYR4sx96qwXT6LNyRg710wpj4tC5ZLakk+SmvUn1N8RSo7J5nrVjCpXy1U+5JI4NXqX9mLndntEt8Mlp3dHQ1CcCF6Onq62n5BU43IQDEgY+8e9WpBrdEPsoQCGc1VDgmENN0jFKDQp3FDchhpjjpwbfsnwSZhvrS8r6Zt2YQw3dZ7SHepdHwDYmZlHghH++3LDW1XuOiVmcdFgnRFx2aM6MpQV8ZxrZqai+m5\"}],\"role\":
+        \"model\"},\"index\": 0}],\"usageMetadata\": {\"promptTokenCount\": 160,\"candidatesTokenCount\":
+        19,\"totalTokenCount\": 282,\"promptTokensDetails\": [{\"modality\": \"TEXT\",\"tokenCount\":
+        160}],\"thoughtsTokenCount\": 103,\"serviceTier\": \"standard\"},\"modelVersion\":
+        \"gemini-3.6-flash\",\"responseId\": \"xtv1avHXBL2gqtsP2and8Qw\"}\r\n\r\ndata:
+        {\"candidates\": [{\"content\": {\"parts\": [{\"text\": \"\"}],\"role\": \"model\"},\"finishReason\":
+        \"STOP\",\"index\": 0}],\"usageMetadata\": {\"promptTokenCount\": 288,\"candidatesTokenCount\":
+        19,\"totalTokenCount\": 410,\"promptTokensDetails\": [{\"modality\": \"TEXT\",\"tokenCount\":
+        288}],\"thoughtsTokenCount\": 103,\"serviceTier\": \"standard\"},\"modelVersion\":
+        \"gemini-3.6-flash\",\"responseId\": \"xtv1avHXBL2gqtsP2and8Qw\"}\r\n\r\n"
+  recorded_at: Thu, 12 Nov 2026 15:31:20 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:streamGenerateContent?alt=sse
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"First search for an order
+        lookup tool, then use it to check order 42. What is its status?"}]},{"role":"model","parts":[{"functionCall":{"name":"find_tools","args":{"query":"order
+        lookup"}},"thoughtSignature":"EvMECvAEAWkUfROCpXKfV7PqADprbeXconrpbh2XCetTzWPxwGJ63Q1lCwKf/xvTxrewL8mhPUSh8S5gFazH1FMr0KMykMv5AMouj+c7tuSU1V+Eh4FtuwarE7OKryEtqYbDxfBoUk+US94CPR/WjqLeq32yVFVh40KdXf/QLE39P4aqfPbN8THokmQPBYzq8ARADVO9fpcKstlmvXZdN6TuoG2+4QsiouO2lDpwMRXXRxVsZ5gKm1qSj+Akm6JfNLOncfd3nl8rC/fALqFGa0OcFwAFzMEXd4A5Ydaupx3zZXsvZVnvYtlYSEhgLLpQIikNhXnx9/BwiAtqOat0dCdq3hXxyJd2pXUsQVcaMlqTKi6O6DIMMairv+M4UrTZqyYRILz3cwrr8NVC44wZKwOTODLMvor2o1YbM7r1VpD4XSBBo4SR4aF316qkYRWVx9ZaciOFNMCDzpISpUTtabzzn3PP6ClemqoShhdWJ8b4EIl/NnQBqi1ZWFyjzr2L5/wpXHQYXug9gKjJeD8UmsQ5tx0q+pTGhhJHL/jCimeDzeahRgaOpilc9OQWYClxbFkklEtY/dNSnNay7SEfXajEx0YqxlW5lTLIDY0gWAmPuRUpeTFQW7FTk3hqxHGDPzx0o8q/dbyHZzodYV3v8t3EvK7Y1yePQZ9RrG3KgzY+jnEdE46LZBDB/JT/7oFfA+G0tik7oOn/jA+MaLQ/lZ+YHrNpFE6HxRvtoVkecQmsu/5EKiUngKkdgC9ICgMiuhC1lgdeZ0vUjOfq4BjORGMQZtuwGR2iJdmQtQtuNPY/6sftduxzOzYwmezZJtrPK1OtCEK1"}]},{"role":"user","parts":[{"functionResponse":{"name":"find_tools","response":{"name":"find_tools","content":[{"text":"{\"loaded\":[\"lookup_order\"]}"}]}}}]},{"role":"model","parts":[{"functionCall":{"name":"lookup_order","args":{"order_id":"42"}},"thoughtSignature":"Ev4DCvsDAWkUfROuzIqM6xo3O2YQaS7DArIH2kViknYMyS8DdZxuKqlrqLK0ubp4jpnk+9tOXdzvyLVIO8kjZ5yRuOIoHDfSrNjUKiwUEr+2naFlI0F8+UCvDR/wo108pSPxWca9txqG510a1MeO1kJDVXyPzWfS5DBNwIpD4zQmokr11U7ZsBpMUQQDJnfQ/CVpzENSbSqmxF3tGCuRVSDJYjx9XV+IgAcX40EVOIjpepF9X3ikfqsKMgyXXTOzH5aB3cI86/3AwDyhumOo0BkVyH/zfAFoPVeuuDI1o0O5wQdcFBZ7FD1kJc5GF65t5kZGbKxOZtZ6RGu8m7cfaUkUZ0eCIQT2mNa7+REbYvb3meSzf0v2paw9y+B2DxL7x46/JnFJ/c1xHlEimc0ASHQ8BVe73cldR+43Sym4pc7ntg8SnEdGYsezcUojbWwOuusWexWYR4sx96qwXT6LNyRg710wpj4tC5ZLakk+SmvUn1N8RSo7J5nrVjCpXy1U+5JI4NXqX9mLndntEt8Mlp3dHQ1CcCF6Onq62n5BU43IQDEgY+8e9WpBrdEPsoQCGc1VDgmENN0jFKDQp3FDchhpjjpwbfsnwSZhvrS8r6Zt2YQw3dZ7SHepdHwDYmZlHghH++3LDW1XuOiVmcdFgnRFx2aM6MpQV8ZxrZqai+m5"}]},{"role":"user","parts":[{"functionResponse":{"name":"lookup_order","response":{"name":"lookup_order","content":[{"text":"Order
+        42 shipped"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"find_tools","description":"Finds
+        tools for a task","parametersJsonSchema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"name":"lookup_order","description":"Looks
+        up an order","parametersJsonSchema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.15.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/event-stream
+      Content-Disposition:
+      - attachment
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Transfer-Encoding:
+      - chunked
+      Date:
+      - Thu, 12 Nov 2026 15:32:16 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=49195
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: "data: {\"candidates\": [{\"content\": {\"parts\": [{\"text\": \"The
+        status of order\"}],\"role\": \"model\"},\"index\": 0}],\"usageMetadata\":
+        {\"promptTokenCount\": 208,\"candidatesTokenCount\": 4,\"totalTokenCount\":
+        252,\"promptTokensDetails\": [{\"modality\": \"TEXT\",\"tokenCount\": 208}],\"thoughtsTokenCount\":
+        40,\"serviceTier\": \"standard\"},\"modelVersion\": \"gemini-3.6-flash\",\"responseId\":
+        \"ztv1aviMOJigz7IPxI-vwQs\"}\r\n\r\ndata: {\"candidates\": [{\"content\":
+        {\"parts\": [{\"text\": \" 42 is **shipped**.\"}],\"role\": \"model\"},\"index\":
+        0}],\"usageMetadata\": {\"promptTokenCount\": 208,\"candidatesTokenCount\":
+        12,\"totalTokenCount\": 260,\"promptTokensDetails\": [{\"modality\": \"TEXT\",\"tokenCount\":
+        208}],\"thoughtsTokenCount\": 40,\"serviceTier\": \"standard\"},\"modelVersion\":
+        \"gemini-3.6-flash\",\"responseId\": \"ztv1aviMOJigz7IPxI-vwQs\"}\r\n\r\ndata:
+        {\"candidates\": [{\"content\": {\"parts\": [{\"text\": \"\",\"thoughtSignature\":
+        \"EoYCCoMCAWkUfRPNbp3zZHoigPsX4Z79OT4tCR5zWBYTrd3TPEAtNG6pjqW0zfJoNyk4MFIcV98YmqIRYJbKSm0XZKPvyYq4sYu7XxksXG4qPDKieXA3xxsJ4w1yZlFRBvFEdMonn6E200l3UQ36/rl173nZIoI8ld34u22lbjQka7GXwRA1aneV/yrr6Hduk4qfq56twSCqXtzpqg0s8y84Yukg3b3NckdjcoO+c2e2Rl3ZsCv+7197wtvnpx+z9vY0rlPZSNDn9/eohPgB1C5KYAg8r1vu19PbsWnRYMslNtpJjytwA3B2sDluqLTI98+ClHTGwTecaqhENBc6HyONV4SYi8BijQ==\"}],\"role\":
+        \"model\"},\"finishReason\": \"STOP\",\"index\": 0}],\"usageMetadata\": {\"promptTokenCount\":
+        439,\"candidatesTokenCount\": 12,\"totalTokenCount\": 491,\"promptTokensDetails\":
+        [{\"modality\": \"TEXT\",\"tokenCount\": 439}],\"thoughtsTokenCount\": 40,\"serviceTier\":
+        \"standard\"},\"modelVersion\": \"gemini-3.6-flash\",\"responseId\": \"ztv1aviMOJigz7IPxI-vwQs\"}\r\n\r\n"
+  recorded_at: Thu, 12 Nov 2026 15:32:16 GMT
+recorded_with: VCR 6.4.1

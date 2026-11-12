@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../../../support/application_tool_search_helpers'
 
 RSpec.describe RubyLLM::Protocols::GPUStack::Responses do
   let(:model) { model_for(:gpustack) }
@@ -70,6 +71,28 @@ RSpec.describe RubyLLM::Protocols::GPUStack::Responses do
     protocol = described_class.new(chat.provider, chat.model)
 
     expect(protocol.send(:parse_completion_body, body, raw: nil).thinking.text).to eq('I can calculate this.')
+  end
+
+  context 'with an application tool search' do
+    include_context 'with application tool search'
+
+    it 'keeps a client search call beside its output instead of replaying it as text' do
+      protocol = described_class.new(chat.provider, chat.model)
+      tools = { find_tools: finder, lookup_order: RubyLLM::Tool::Deferred.new(target) }
+      messages = [pending_search_message, search_result_message]
+
+      input = protocol.send(:render_payload, messages, tools:, temperature: nil, model: chat.model)[:input]
+
+      expect(input).to eq([
+                            { type: 'tool_search_call', execution: 'client', call_id: 'search_1',
+                              status: 'completed', arguments: { 'query' => 'orders' } },
+                            { type: 'tool_search_output', execution: 'client', call_id: 'search_1',
+                              status: 'completed',
+                              tools: [{ type: 'function', name: 'lookup_order', description: 'Looks up an order',
+                                        parameters: target.parameters_schema, strict: false,
+                                        defer_loading: true }] }
+                          ])
+    end
   end
 
   it 'passes documented browser subtool filters to the configured server' do
