@@ -10,7 +10,7 @@ RSpec.describe RubyLLM::Chat do
 
   it 'keeps the search tool eager when all tools are deferred together' do
     expect(chat.deferred_tools.keys).to eq([:lookup_order])
-    expect(chat.tools[:find_tools]).to be(finder)
+    expect(chat.tools[:tool_search]).to be(finder)
   end
 
   it 'keeps the search tool eager when its class declares defer' do
@@ -26,14 +26,14 @@ RSpec.describe RubyLLM::Chat do
     agent.tools FindTools, LookupOrder, defer: true
 
     expect(agent.chat.deferred_tools.keys).to eq([:lookup_order])
-    expect(agent.chat.tools.keys).to eq(%i[lookup_order find_tools])
+    expect(agent.chat.tools.keys).to eq(%i[lookup_order tool_search])
   end
 
   it 'offers the search tool only while a tool is deferred, without recursing' do
     plain = described_class.new(model: 'gpt-5.4', provider: :openai).with_tools(finder, target)
 
     expect(plain.tools.keys).to eq([:lookup_order])
-    expect(plain.with_tools(target, defer: true).tools.keys).to eq(%i[lookup_order find_tools])
+    expect(plain.with_tools(target, defer: true).tools.keys).to eq(%i[lookup_order tool_search])
   end
 
   it 'executes the search tool and stores what it loaded' do
@@ -45,11 +45,20 @@ RSpec.describe RubyLLM::Chat do
     expect(chat.messages.last.raw_content).to be_nil
   end
 
-  it 'rejects a second search tool' do
-    other = Class.new(FindTools) { def self.tool_name = 'another_search' }
+  it 'registers the search after an ordinary deferred tool' do
+    configured = described_class.new(model: 'gpt-5.4', provider: :openai).with_tools(target, defer: true)
+    configured.with_tools(finder)
 
-    expect { chat.with_tools(other) }.to raise_error(ArgumentError, 'find_tools and another_search both search ' \
-                                                                    'tools. Register one')
+    expect(configured.tools).to eq(lookup_order: target, tool_search: finder)
+    expect(configured.deferred_tools).to eq(lookup_order: target)
+  end
+
+  it 'replaces the search tool registered under the same name' do
+    replacement = FindTools.new
+    chat.with_tools(replacement)
+
+    expect(chat.tools).to eq(lookup_order: target, tool_search: replacement)
+    expect(chat.deferred_tools).to eq(lookup_order: target)
   end
 
   it 'names the search tool to a model that calls a tool it has not loaded' do
@@ -57,7 +66,7 @@ RSpec.describe RubyLLM::Chat do
     chat.add_message(role: :assistant, content: nil, tool_calls: { call.id => call })
     chat.run_tools
 
-    expect(chat.messages.last.content).to include('Did you mean `lookup_order`?', 'Find tools with `find_tools`.')
+    expect(chat.messages.last.content).to include('Did you mean `lookup_order`?', 'Find tools with `tool_search`.')
   end
 
   describe 'on a provider without tool search' do
@@ -69,11 +78,11 @@ RSpec.describe RubyLLM::Chat do
       chat.render[:tools].flat_map { |tool| tool[:functionDeclarations] }.map { |declaration| declaration[:name] }
     end
 
-    it 'replaces tool_search with the search tool' do
+    it 'offers the application search under the canonical name' do
       chat.add_message(role: :user, content: 'Hi')
 
-      expect(chat.tools.keys).to eq(%i[lookup_order find_tools])
-      expect(declared(chat)).to eq(%w[find_tools])
+      expect(chat.tools.keys).to eq(%i[lookup_order tool_search])
+      expect(declared(chat)).to eq(%w[tool_search])
     end
 
     it 'appends the tools the search loaded, after the others' do
@@ -81,7 +90,7 @@ RSpec.describe RubyLLM::Chat do
       chat.add_message(pending_search_message)
       chat.run_tools
 
-      expect(declared(chat)).to eq(%w[find_tools lookup_order])
+      expect(declared(chat)).to eq(%w[tool_search lookup_order])
     end
 
     it 'keeps a search result whole when the file store saves long results as files' do
@@ -91,7 +100,7 @@ RSpec.describe RubyLLM::Chat do
       chat.run_tools
 
       expect(chat.messages.last.content).to eq('{"loaded":["lookup_order"]}')
-      expect(declared(chat)).to eq(%w[list_files read_file search_files write_file edit_file find_tools lookup_order])
+      expect(declared(chat)).to eq(%w[list_files read_file search_files write_file edit_file tool_search lookup_order])
     end
 
     it 'still loads what the built-in tool_search found before the search tool was registered' do
@@ -100,21 +109,21 @@ RSpec.describe RubyLLM::Chat do
       chat.add_message(role: :assistant, content: nil, tool_calls: { call.id => call })
       chat.add_message(role: :tool, content: { loaded: %w[lookup_order], tools: [] }.to_json, tool_call_id: 'search_0')
 
-      expect(declared(chat)).to eq(%w[find_tools lookup_order])
+      expect(declared(chat)).to eq(%w[tool_search lookup_order])
     end
 
-    it 'forgets what a renamed search tool loaded, except tools the model went on to call' do
+    it 'ignores search-shaped content from an unregistered tool, but loads called targets' do
       chat.add_message(role: :user, content: 'Hi')
-      chat.add_message(pending_search_message(name: 'old_search'))
+      chat.add_message(pending_search_message(name: 'lookup_customer'))
       chat.add_message(search_result_message)
 
-      expect(declared(chat)).to eq(%w[find_tools])
+      expect(declared(chat)).to eq(%w[tool_search])
 
       call = RubyLLM::ToolCall.new(id: 'order_1', name: 'lookup_order', arguments: { 'order_id' => '42' })
       chat.add_message(role: :assistant, content: nil, tool_calls: { call.id => call })
       chat.add_message(role: :tool, content: 'Order 42 shipped', tool_call_id: 'order_1')
 
-      expect(declared(chat)).to eq(%w[find_tools lookup_order])
+      expect(declared(chat)).to eq(%w[tool_search lookup_order])
     end
 
     it 'counts tokens with the tools of the request' do
@@ -129,7 +138,7 @@ RSpec.describe RubyLLM::Chat do
       chat.count_tokens
 
       declarations = counted.dig('generateContentRequest', 'tools').flat_map { |tool| tool['functionDeclarations'] }
-      expect(declarations.map { |declaration| declaration['name'] }).to eq(%w[find_tools lookup_order])
+      expect(declarations.map { |declaration| declaration['name'] }).to eq(%w[tool_search lookup_order])
     end
   end
 
@@ -140,8 +149,9 @@ RSpec.describe RubyLLM::Chat do
     chat.run_tools
     payload = chat.render
 
-    expect(payload[:tools].map { |tool| tool.dig(:function, :name) }).to eq(%w[find_tools lookup_order])
-    expect(payload.to_json).not_to include('defer_loading', 'tool_search')
+    expect(payload[:tools].map { |tool| tool.dig(:function, :name) }).to eq(%w[tool_search lookup_order])
+    expect(payload[:tools].map { |tool| tool[:type] }).to eq(%w[function function])
+    expect(payload.to_json).not_to include('defer_loading', 'tool_search_call')
     expect(payload[:messages].last[:content]).to eq('{"loaded":["lookup_order"]}')
   end
 
@@ -150,7 +160,7 @@ RSpec.describe RubyLLM::Chat do
     grok.add_message(role: :user, content: 'Hi')
     tools = grok.render[:tools]
 
-    expect(tools.map { |tool| tool.slice(:type, :name) }).to eq([{ type: 'function', name: 'find_tools' }])
+    expect(tools.map { |tool| tool.slice(:type, :name) }).to eq([{ type: 'function', name: 'tool_search' }])
     expect(tools.to_json).not_to include('defer_loading', 'execution')
   end
 end

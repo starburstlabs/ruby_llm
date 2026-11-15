@@ -6,7 +6,7 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"First search for an order
-        lookup tool, then use it to check order 42. What is its status?"}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"find_tools","description":"Finds
+        lookup tool, then use it to check order 42. What is its status?"}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"tool_search","description":"Finds
         tools for a task","parametersJsonSchema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}}]}]}'
     headers:
       User-Agent:
@@ -33,7 +33,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 12 Nov 2026 15:29:46 GMT
+      - Sun, 15 Nov 2026 19:42:50 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -43,7 +43,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1231
+      - gfet4t7; dur=1120
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -58,13 +58,13 @@ http_interactions:
                 "parts": [
                   {
                     "functionCall": {
-                      "name": "find_tools",
+                      "name": "tool_search",
                       "args": {
                         "query": "order lookup"
                       },
-                      "id": "call_10596778296654084991"
+                      "id": "call_5007654552926559952"
                     },
-                    "thoughtSignature": "EugDCuUDAWkUfRMl9/+j0qWuDblNPGSY/JXfhJsvGR87qEygKSuFzyyCEbxTeNX0d7S3rZ5+FlhbDOHhkDGejQ97Xa3jYfiiYKKMIjSkvz4uCINGng08NVDpqjXnXBEHWgB56zcj65SgN3M3ftBP9IOIgYsVOHK85F8VgX9hO39Qeb6a89W9RTG7H9iOn8iX21tlxIotC0zgTtAPrtWihHBU0EDHxsekf70h/wgh2l9s/OkIPHso7HnLoU9Nu03VzETa12p4qxS+QJxBLEf+MLQyzNG0j4CTi0p+P5JMfMv2mvVkZEQqDsgWl9ne90hXj98JFY50aMoGqdnQad9BZihilT9N91JebnDgi7G/JKoBXve0r7vgLNUCqyW+jE+Vfh9EwP/eAibe5bnPJ9qDUkI7MWGZaITvK/oClCLOouxQTzNt6iqlLgko7U6jYiQVAbyfogWVlL4bN0Y5fi03FEcFtPW3sI4rO395YFWcP43pULSeB/4mVG/t1BFlqyG29xDrFSnbSBYWwxH3N4vf2/WEhe1ihnay7Rf0WEq1VD7AeTkVxDNo7I+/F7EySTodm5HNDr0WpN3Fs+hNuMGoHFw/6KKT7Ly4T5C6BaigsCgr5i224YZb46qQZBp8Y4jeNkVEKSlFX27sg0U="
+                    "thoughtSignature": "EuYDCuMDAWkUfRNk/HSxK2QVokiIQvqvyZYfEoVQM33wMe6ZAB6wdpOqCoAz02hejdGD9TjRZqwedwTgLBGSFctCOJadtYwSCkUMsrFDz12vjh47sbdNpwvOl1YZMxdolsyNzoogWDOcyRox9PoaUlNDpKXng4BPavVtfhXPdeNSxf4/ZDUyKnd1VSdgmynKhLYuXA89W5/qzuFUYbRvb6ZgIUb3LKPwyiulXtXnVrbDSIkIyJqqNSwRCms+UpdZUdyaJUcVNzdZrOYI/G8nuxM/p9tHgwAFJNC3RQwUgt7I1DxejhF2vqeL542GIyjhfSaVOkap59pEcRG/tJFFUC37ixP9uQCdtulcqruFqR3GF3+EaK4NyJrSVVb5OTK7f6ZtlDOjnMc5dcj5moVIHVyXyaW+KyGEFdOXJRRtIXgNkqcesfPNTAnLEAqxkUxy3PBQCIhj3KgrkDmT6c86NPkZUUHE5Icz6KW/e0urBDjXHD7qlQHJMzH0leXJGLnufliotvVle9ConpsLj+8jlMwDnh4fBHziP3crYmMU9XTJ2vNwIsVq/xxBCLZZD1YdGKFu3FqRtm4wxk8T2i/J43RlJp/+1LEufXbcggcWLSHWDSyLLIGSiMkD97QRFuapaWDtvMvXxOkH"
                   }
                 ],
                 "role": "model"
@@ -77,28 +77,28 @@ http_interactions:
           "usageMetadata": {
             "promptTokenCount": 67,
             "candidatesTokenCount": 17,
-            "totalTokenCount": 191,
+            "totalTokenCount": 200,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
                 "tokenCount": 67
               }
             ],
-            "thoughtsTokenCount": 107,
+            "thoughtsTokenCount": 116,
             "serviceTier": "standard"
           },
           "modelVersion": "gemini-3.6-flash",
-          "responseId": "aNv1aqT1NK20qtsP94aduAo"
+          "responseId": "OQv6aouGJ4mhqtsP-KqbgAg"
         }
-  recorded_at: Thu, 12 Nov 2026 15:29:46 GMT
+  recorded_at: Sun, 15 Nov 2026 19:42:50 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"First search for an order
-        lookup tool, then use it to check order 42. What is its status?"}]},{"role":"model","parts":[{"functionCall":{"name":"find_tools","args":{"query":"order
-        lookup"}},"thoughtSignature":"EugDCuUDAWkUfRMl9/+j0qWuDblNPGSY/JXfhJsvGR87qEygKSuFzyyCEbxTeNX0d7S3rZ5+FlhbDOHhkDGejQ97Xa3jYfiiYKKMIjSkvz4uCINGng08NVDpqjXnXBEHWgB56zcj65SgN3M3ftBP9IOIgYsVOHK85F8VgX9hO39Qeb6a89W9RTG7H9iOn8iX21tlxIotC0zgTtAPrtWihHBU0EDHxsekf70h/wgh2l9s/OkIPHso7HnLoU9Nu03VzETa12p4qxS+QJxBLEf+MLQyzNG0j4CTi0p+P5JMfMv2mvVkZEQqDsgWl9ne90hXj98JFY50aMoGqdnQad9BZihilT9N91JebnDgi7G/JKoBXve0r7vgLNUCqyW+jE+Vfh9EwP/eAibe5bnPJ9qDUkI7MWGZaITvK/oClCLOouxQTzNt6iqlLgko7U6jYiQVAbyfogWVlL4bN0Y5fi03FEcFtPW3sI4rO395YFWcP43pULSeB/4mVG/t1BFlqyG29xDrFSnbSBYWwxH3N4vf2/WEhe1ihnay7Rf0WEq1VD7AeTkVxDNo7I+/F7EySTodm5HNDr0WpN3Fs+hNuMGoHFw/6KKT7Ly4T5C6BaigsCgr5i224YZb46qQZBp8Y4jeNkVEKSlFX27sg0U="}]},{"role":"user","parts":[{"functionResponse":{"name":"find_tools","response":{"name":"find_tools","content":[{"text":"{\"loaded\":[\"lookup_order\"]}"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"find_tools","description":"Finds
+        lookup tool, then use it to check order 42. What is its status?"}]},{"role":"model","parts":[{"functionCall":{"name":"tool_search","args":{"query":"order
+        lookup"}},"thoughtSignature":"EuYDCuMDAWkUfRNk/HSxK2QVokiIQvqvyZYfEoVQM33wMe6ZAB6wdpOqCoAz02hejdGD9TjRZqwedwTgLBGSFctCOJadtYwSCkUMsrFDz12vjh47sbdNpwvOl1YZMxdolsyNzoogWDOcyRox9PoaUlNDpKXng4BPavVtfhXPdeNSxf4/ZDUyKnd1VSdgmynKhLYuXA89W5/qzuFUYbRvb6ZgIUb3LKPwyiulXtXnVrbDSIkIyJqqNSwRCms+UpdZUdyaJUcVNzdZrOYI/G8nuxM/p9tHgwAFJNC3RQwUgt7I1DxejhF2vqeL542GIyjhfSaVOkap59pEcRG/tJFFUC37ixP9uQCdtulcqruFqR3GF3+EaK4NyJrSVVb5OTK7f6ZtlDOjnMc5dcj5moVIHVyXyaW+KyGEFdOXJRRtIXgNkqcesfPNTAnLEAqxkUxy3PBQCIhj3KgrkDmT6c86NPkZUUHE5Icz6KW/e0urBDjXHD7qlQHJMzH0leXJGLnufliotvVle9ConpsLj+8jlMwDnh4fBHziP3crYmMU9XTJ2vNwIsVq/xxBCLZZD1YdGKFu3FqRtm4wxk8T2i/J43RlJp/+1LEufXbcggcWLSHWDSyLLIGSiMkD97QRFuapaWDtvMvXxOkH"}]},{"role":"user","parts":[{"functionResponse":{"name":"tool_search","response":{"name":"tool_search","content":[{"text":"{\"loaded\":[\"lookup_order\"]}"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"tool_search","description":"Finds
         tools for a task","parametersJsonSchema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"name":"lookup_order","description":"Looks
         up an order","parametersJsonSchema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true}}]}]}'
     headers:
@@ -126,7 +126,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 12 Nov 2026 15:29:52 GMT
+      - Sun, 15 Nov 2026 19:42:52 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -136,7 +136,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=6390
+      - gfet4t7; dur=1100
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -155,9 +155,9 @@ http_interactions:
                       "args": {
                         "order_id": "42"
                       },
-                      "id": "call_16927088217788766907"
+                      "id": "call_17501076033849020043"
                     },
-                    "thoughtSignature": "EtEBCs4BAWkUfRPMPmPjdjUUz0FkIn8vm5674CD761T0oX5RTRdhTPduaxKS0SRUW7DbgbwIZL5USfO0cBpirjg66RkQ9UowZXoE7ZraAWxFG82kc4MCb2Hj8KTb5NwzDrSvtQNHg38G9RPcttIKnyyYqTpd8pvZGBp6y15a1vXhjjxb7GDlB6NdGaHxsGGXKrtbOO+k+uSEyvuA+tSdC1aXRXJNOA8z3RfcVtbbuYlf8rNWlKn8fiw/pBpQ+cueZiRq8dsJvYXtO5MYQq5jL7pYrIM="
+                    "thoughtSignature": "EowCCokCAWkUfRNtzF9WSUvlWEV+zUbqFOADHv7+cYO4NZhJpRbGuxTfEpR+CmwN4xwbAjmQ/hb7PpWERjHNqMB+AP5bbpJ69GDR8V6VNwGWcoddbzuJtMs8OxDTPdK2O6GyEOFPHkSlpp6YiihARIngEUbWNWzZJjsYkWF6rnLyLnuCnypLqDm6VWkCjzcYb09WNIBCqoBq61NTu+wSd91t7txBZTMHijuGciatMluJutZ6DYFKgfA7h73+OUZ5jl4zQMD2eeLBbPk6iKL6tgezsRKyO6ZDZgWu8nlMeOwxrfxlhLNaB8kEXPw4YOQzg0J5zQgAHYgtS3k4gF9Vb0jSBv9IGmXxMuTMn0DPhw=="
                   }
                 ],
                 "role": "model"
@@ -168,31 +168,31 @@ http_interactions:
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 267,
+            "promptTokenCount": 276,
             "candidatesTokenCount": 19,
-            "totalTokenCount": 321,
+            "totalTokenCount": 348,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 267
+                "tokenCount": 276
               }
             ],
-            "thoughtsTokenCount": 35,
+            "thoughtsTokenCount": 53,
             "serviceTier": "standard"
           },
           "modelVersion": "gemini-3.6-flash",
-          "responseId": "atv1atCzIv6tqtsPqPDWiAs"
+          "responseId": "Owv6auGjD6qlmtkPm_LCgAc"
         }
-  recorded_at: Thu, 12 Nov 2026 15:29:52 GMT
+  recorded_at: Sun, 15 Nov 2026 19:42:52 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"First search for an order
-        lookup tool, then use it to check order 42. What is its status?"}]},{"role":"model","parts":[{"functionCall":{"name":"find_tools","args":{"query":"order
-        lookup"}},"thoughtSignature":"EugDCuUDAWkUfRMl9/+j0qWuDblNPGSY/JXfhJsvGR87qEygKSuFzyyCEbxTeNX0d7S3rZ5+FlhbDOHhkDGejQ97Xa3jYfiiYKKMIjSkvz4uCINGng08NVDpqjXnXBEHWgB56zcj65SgN3M3ftBP9IOIgYsVOHK85F8VgX9hO39Qeb6a89W9RTG7H9iOn8iX21tlxIotC0zgTtAPrtWihHBU0EDHxsekf70h/wgh2l9s/OkIPHso7HnLoU9Nu03VzETa12p4qxS+QJxBLEf+MLQyzNG0j4CTi0p+P5JMfMv2mvVkZEQqDsgWl9ne90hXj98JFY50aMoGqdnQad9BZihilT9N91JebnDgi7G/JKoBXve0r7vgLNUCqyW+jE+Vfh9EwP/eAibe5bnPJ9qDUkI7MWGZaITvK/oClCLOouxQTzNt6iqlLgko7U6jYiQVAbyfogWVlL4bN0Y5fi03FEcFtPW3sI4rO395YFWcP43pULSeB/4mVG/t1BFlqyG29xDrFSnbSBYWwxH3N4vf2/WEhe1ihnay7Rf0WEq1VD7AeTkVxDNo7I+/F7EySTodm5HNDr0WpN3Fs+hNuMGoHFw/6KKT7Ly4T5C6BaigsCgr5i224YZb46qQZBp8Y4jeNkVEKSlFX27sg0U="}]},{"role":"user","parts":[{"functionResponse":{"name":"find_tools","response":{"name":"find_tools","content":[{"text":"{\"loaded\":[\"lookup_order\"]}"}]}}}]},{"role":"model","parts":[{"functionCall":{"name":"lookup_order","args":{"order_id":"42"}},"thoughtSignature":"EtEBCs4BAWkUfRPMPmPjdjUUz0FkIn8vm5674CD761T0oX5RTRdhTPduaxKS0SRUW7DbgbwIZL5USfO0cBpirjg66RkQ9UowZXoE7ZraAWxFG82kc4MCb2Hj8KTb5NwzDrSvtQNHg38G9RPcttIKnyyYqTpd8pvZGBp6y15a1vXhjjxb7GDlB6NdGaHxsGGXKrtbOO+k+uSEyvuA+tSdC1aXRXJNOA8z3RfcVtbbuYlf8rNWlKn8fiw/pBpQ+cueZiRq8dsJvYXtO5MYQq5jL7pYrIM="}]},{"role":"user","parts":[{"functionResponse":{"name":"lookup_order","response":{"name":"lookup_order","content":[{"text":"Order
-        42 shipped"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"find_tools","description":"Finds
+        lookup tool, then use it to check order 42. What is its status?"}]},{"role":"model","parts":[{"functionCall":{"name":"tool_search","args":{"query":"order
+        lookup"}},"thoughtSignature":"EuYDCuMDAWkUfRNk/HSxK2QVokiIQvqvyZYfEoVQM33wMe6ZAB6wdpOqCoAz02hejdGD9TjRZqwedwTgLBGSFctCOJadtYwSCkUMsrFDz12vjh47sbdNpwvOl1YZMxdolsyNzoogWDOcyRox9PoaUlNDpKXng4BPavVtfhXPdeNSxf4/ZDUyKnd1VSdgmynKhLYuXA89W5/qzuFUYbRvb6ZgIUb3LKPwyiulXtXnVrbDSIkIyJqqNSwRCms+UpdZUdyaJUcVNzdZrOYI/G8nuxM/p9tHgwAFJNC3RQwUgt7I1DxejhF2vqeL542GIyjhfSaVOkap59pEcRG/tJFFUC37ixP9uQCdtulcqruFqR3GF3+EaK4NyJrSVVb5OTK7f6ZtlDOjnMc5dcj5moVIHVyXyaW+KyGEFdOXJRRtIXgNkqcesfPNTAnLEAqxkUxy3PBQCIhj3KgrkDmT6c86NPkZUUHE5Icz6KW/e0urBDjXHD7qlQHJMzH0leXJGLnufliotvVle9ConpsLj+8jlMwDnh4fBHziP3crYmMU9XTJ2vNwIsVq/xxBCLZZD1YdGKFu3FqRtm4wxk8T2i/J43RlJp/+1LEufXbcggcWLSHWDSyLLIGSiMkD97QRFuapaWDtvMvXxOkH"}]},{"role":"user","parts":[{"functionResponse":{"name":"tool_search","response":{"name":"tool_search","content":[{"text":"{\"loaded\":[\"lookup_order\"]}"}]}}}]},{"role":"model","parts":[{"functionCall":{"name":"lookup_order","args":{"order_id":"42"}},"thoughtSignature":"EowCCokCAWkUfRNtzF9WSUvlWEV+zUbqFOADHv7+cYO4NZhJpRbGuxTfEpR+CmwN4xwbAjmQ/hb7PpWERjHNqMB+AP5bbpJ69GDR8V6VNwGWcoddbzuJtMs8OxDTPdK2O6GyEOFPHkSlpp6YiihARIngEUbWNWzZJjsYkWF6rnLyLnuCnypLqDm6VWkCjzcYb09WNIBCqoBq61NTu+wSd91t7txBZTMHijuGciatMluJutZ6DYFKgfA7h73+OUZ5jl4zQMD2eeLBbPk6iKL6tgezsRKyO6ZDZgWu8nlMeOwxrfxlhLNaB8kEXPw4YOQzg0J5zQgAHYgtS3k4gF9Vb0jSBv9IGmXxMuTMn0DPhw=="}]},{"role":"user","parts":[{"functionResponse":{"name":"lookup_order","response":{"name":"lookup_order","content":[{"text":"Order
+        42 shipped"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"tool_search","description":"Finds
         tools for a task","parametersJsonSchema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"],"additionalProperties":false,"strict":true}},{"name":"lookup_order","description":"Looks
         up an order","parametersJsonSchema":{"type":"object","properties":{"order_id":{"type":"string"}},"required":["order_id"],"additionalProperties":false,"strict":true}}]}]}'
     headers:
@@ -220,7 +220,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 12 Nov 2026 15:29:53 GMT
+      - Sun, 15 Nov 2026 19:42:53 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -230,7 +230,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=780
+      - gfet4t7; dur=1195
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -245,7 +245,7 @@ http_interactions:
                 "parts": [
                   {
                     "text": "The status of order 42 is **shipped**.",
-                    "thoughtSignature": "Ep8CCpwCAWkUfRPMMBsB2CcqRxvaFtMn/7rpC+BmCIFG8c7wXqFEbP+6U0tkFZl1vC+s+1PcHuUpe/U/Ay5pd0ZxDhxZuI5EqyPSp2x6lclnYYQji75VWtDF46Vlh0CP4s437x1k5Z9iH4vYGUgt2H0jczlSrmqMQVFxVXs0vWE8zDShAKSvM4C6dO1t/jXOXObwgBHQ29lr+0kFQSPIQ2Ngld7wWNJrNIDGCBLN8iKzDP9v9lp1kmN6eULbN7xNy8gaZtJhequ3okWD5LzdADXpZbDTR00ATD7TyeSTK25j0YpY0dYoZ7G3lf/inTYoe0VkwMpZn3/mo1srYLU25sMFzivaaDOigQ3RkR9b6aB2e12Q0Qra/aPJSi7f8xLwtkw="
+                    "thoughtSignature": "Er0BCroBAWkUfRNYLmY1hIIsMdfo6urswa8J6/7R7Dwpk9FSViU+XmuE3ePVsVpbRmN3/Y3NQ+pUvKMhfxxYg+nvWQKH4dc+xE4GYlisG8EpJy+zhowo5cCaY51j061Oz4sqFTwfGGgBKVlGDv2FEh0jz2e6FsqfQFNMgc/ceNDbZ4cfB71h36sKE3LXmV91Dsre9u2J48Qpwb4BDFlH0B8SDc7OBRjBEpHbXEE8kWBaWqOeJFpsVq7DPorjEuYV"
                   }
                 ],
                 "role": "model"
@@ -255,20 +255,20 @@ http_interactions:
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 350,
+            "promptTokenCount": 377,
             "candidatesTokenCount": 12,
-            "totalTokenCount": 403,
+            "totalTokenCount": 411,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 350
+                "tokenCount": 377
               }
             ],
-            "thoughtsTokenCount": 41,
+            "thoughtsTokenCount": 22,
             "serviceTier": "standard"
           },
           "modelVersion": "gemini-3.6-flash",
-          "responseId": "cdv1asj0CvWFz7IPsfvnkAk"
+          "responseId": "PAv6avujLojpz7IPl7rSmAY"
         }
-  recorded_at: Thu, 12 Nov 2026 15:29:53 GMT
+  recorded_at: Sun, 15 Nov 2026 19:42:53 GMT
 recorded_with: VCR 6.4.1

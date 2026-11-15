@@ -714,8 +714,10 @@ module RubyLLM
     # model's context until the provider's tool search loads the ones it
     # needs, or <tt>defer: false</tt> to offer a tool declared with
     # Tool.defer up front. See #deferred_tools. A tool declared with
-    # Tool.searches_tools is never deferred: it is the search. Raises
-    # ArgumentError when a second one is registered.
+    # Tool.searches_tools is never deferred. It is named +tool_search+ and
+    # has no namespace. Registering another declared search tool replaces
+    # it. Raises ArgumentError for a different name, a namespace, or an
+    # ordinary tool registered under the same name.
     #
     #   chat.with_tools(*Catalog.tools, defer: true)
     #
@@ -1706,6 +1708,7 @@ module RubyLLM
     # Receives a completion produced out-of-band (e.g. by a batch), running the
     # same callbacks as a synchronous completion so persistence works unchanged.
     def add_completion(response, record_usage: false) # :nodoc:
+      response = normalize_completion(prepare_message(response))
       if response.ruby_llm_usage_entries.empty?
         record_out_of_band_usage(response)
       elsif record_usage
@@ -3160,7 +3163,11 @@ module RubyLLM
 
     def pending_tool_response
       response = latest_response(messages)
-      response if response&.tool_call? && pending_tool_calls(response).any?
+      return unless response&.tool_call? && pending_tool_calls(response).any?
+
+      normalized = normalize_completion(response)
+      messages[messages.index(response)] = normalized unless normalized.equal?(response)
+      normalized
     end
 
     # A blank response answers nothing, so it never hides the round before

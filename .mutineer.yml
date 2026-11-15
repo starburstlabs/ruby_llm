@@ -57,3 +57,6 @@ ignore:
   # Chat#release_tool_calls: a call answered in this run dropped its claim
   # when its result was recorded, so releasing it again changes nothing.
   - cd2b9be256c9
+  # Responses::TokenCounting#render_count_tokens_payload: the count is sliced
+  # to COUNT_TOKENS_KEYS, which drops the temperature.
+  - 58f19ed502c3

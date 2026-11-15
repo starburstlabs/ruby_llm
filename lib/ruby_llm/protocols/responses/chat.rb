@@ -17,10 +17,6 @@ module RubyLLM
           tools.each_value.none? { |tool| tool.namespace == call.namespace }
         end
 
-        def complete(messages, tools:, **, &)
-          restore_search_calls(super, tools)
-        end
-
         def completion_url
           'responses'
         end
@@ -183,20 +179,6 @@ module RubyLLM
                          **ToolCall.parse_arguments(item['arguments'], response:, finish_reason:))
           end
           ToolCall.index(calls, by: :provider_call_id)
-        end
-
-        def restore_search_calls(message, tools)
-          search = RubyLLM::Tools::Search.declared(tools)
-          return message unless search && message.is_a?(Message)
-
-          searched = replayed_search_call_ids(message.raw_content)
-          return message if searched.empty?
-
-          message.with_tool_calls(message.tool_calls.transform_values do |call|
-            next call unless searched.include?(call.provider_call_id)
-
-            rebuild_tool_call(call, name: search.name, namespace: search.namespace)
-          end)
         end
 
         def replayed_search_call_ids(raw)

@@ -57,7 +57,7 @@ RSpec.describe RubyLLM::Chat do
     requests = []
     stub_request(:post, url).to_return do |request|
       requests << JSON.parse(request.body)
-      replies.shift
+      replies.shift || raise("Unexpected request to #{url} after scripted replies were exhausted")
     end
     requests
   end
@@ -113,7 +113,7 @@ RSpec.describe RubyLLM::Chat do
         expect(finder.queries).to eq(['orders'])
         expect(requests.size).to eq(3)
         expect(requests[0]['tools'].map { |tool| tool.slice('name', 'defer_loading') })
-          .to eq([{ 'name' => 'lookup_order', 'defer_loading' => true }, { 'name' => 'find_tools' }])
+          .to eq([{ 'name' => 'lookup_order', 'defer_loading' => true }, { 'name' => 'tool_search' }])
         expect(requests[1]['messages'].last['content'].first).to eq(
           'type' => 'tool_result', 'tool_use_id' => 'search_1',
           'content' => [{ 'type' => 'tool_reference', 'tool_name' => 'lookup_order' }]
@@ -129,7 +129,7 @@ RSpec.describe RubyLLM::Chat do
   it 'answers a declined search with an empty output and the text of the refusal' do
     FindTools.requires_approval
     chat = chat_on(:openai, 'gpt-5.4')
-    stub_request(:post, 'https://api.openai.com/v1/responses').to_return(json_response(fixture(:responses, :search)))
+    stub_replies('https://api.openai.com/v1/responses', [json_response(fixture(:responses, :search))])
     chat.ask('Find order 42')
     chat.decline(chat.pending_questions.find(&:approval?))
     chat.run_tools
@@ -177,7 +177,7 @@ RSpec.describe RubyLLM::Chat do
     chat.with_model(model_for(:anthropic), provider: :anthropic)
     payload = chat.render
 
-    expect(payload[:messages][1][:content].first).to include(type: 'tool_use', id: 'search_1', name: 'find_tools')
+    expect(payload[:messages][1][:content].first).to include(type: 'tool_use', id: 'search_1', name: 'tool_search')
     expect(payload[:messages].last[:content].first[:content]).to eq([{ type: 'tool_reference',
                                                                        tool_name: 'lookup_order' }])
     expect(payload.to_json).not_to include('tool_search_call')
@@ -209,7 +209,7 @@ RSpec.describe RubyLLM::Chat do
     gemini = chat.render
     declared = gemini[:tools].flat_map { |tool| tool[:functionDeclarations] }.map { |declaration| declaration[:name] }
 
-    expect(declared).to eq(%w[find_tools lookup_order])
+    expect(declared).to eq(%w[tool_search lookup_order])
     expect(gemini.to_json).not_to include('tool_search_call', 'defer_loading')
 
     chat.with_model('gpt-5.4', provider: :openai)

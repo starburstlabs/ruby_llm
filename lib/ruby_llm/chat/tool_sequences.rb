@@ -10,6 +10,19 @@ module RubyLLM
     module ToolSequences # :nodoc:
       private
 
+      def normalize_completion(response)
+        return response unless response.tool_call?
+
+        normalized = @provider.normalize_completion(response, tools: tools, model: @model, protocol: @protocol)
+        normalized = response if normalized.tool_calls.to_h.all? do |id, call|
+          original = response.tool_calls.fetch(id)
+          call.name == original.name && call.namespace == original.namespace
+        end
+
+        normalized.ruby_llm_usage_entries = response.ruby_llm_usage_entries
+        normalized
+      end
+
       def tool_for(call)
         tool = tools[call.qualified_name.to_sym]
         tool if tool && tool.namespace == call.namespace && tool.name.to_s == call.name.to_s

@@ -23,7 +23,7 @@ RSpec.describe RubyLLM::Chat, :live do
       expect(finder.queries).not_to be_empty
       expect(response.content.downcase).to include('shipped')
       expect(chat.messages.map(&:content)).to include('{"loaded":["lookup_order"]}')
-      expect(calls(chat)).to include(have_attributes(name: 'find_tools'),
+      expect(calls(chat)).to include(have_attributes(name: 'tool_search'),
                                      have_attributes(name: 'lookup_order', arguments: { 'order_id' => '42' }))
     end
 

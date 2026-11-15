@@ -169,6 +169,10 @@ module RubyLLM
       preprocessing_protocol(protocol, model).tool_search?
     end
 
+    def normalize_completion(message, model:, tools:, protocol: nil) # :nodoc:
+      preprocessing_protocol(protocol, model).normalize_completion(message, tools:)
+    end
+
     def skipped_tool_call_error(tool_call, model:, protocol: nil) # :nodoc:
       resolve_protocol(protocol, model).new(self, model).skipped_tool_call_error(tool_call)
     end

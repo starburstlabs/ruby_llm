@@ -16,10 +16,6 @@ module RubyLLM
       inline_limit false
       searches_tools
 
-      def self.tool_name
-        'tool_search'
-      end
-
       def self.search?(tool_call, tools)
         tool = tools[tool_call.qualified_name.to_sym]
         tool ? tool.searches_tools? : tool_call.qualified_name == tool_name

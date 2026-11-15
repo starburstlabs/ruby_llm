@@ -35,8 +35,8 @@ module RubyLLM
         false
       end
 
-      def complete(messages, tools:, **options, &block) # :nodoc:
-        restore_tool_namespaces(super, tools)
+      def normalize_completion(message, tools:) # :nodoc:
+        restore_tool_namespaces(message, tools)
       end
 
       def render(messages, tools:, **) # :nodoc:

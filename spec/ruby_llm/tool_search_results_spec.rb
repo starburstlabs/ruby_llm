@@ -21,6 +21,10 @@ RSpec.describe RubyLLM::ToolSearchResults do
     expect(described_class.new(CustomerLookup, CustomerLookup.new).names).to eq(%w[crm_customer_lookup])
   end
 
+  it 'names the base tool class and instance as the chat registers them' do
+    expect(described_class.new(RubyLLM::Tool, RubyLLM::Tool.new).names).to eq([RubyLLM::Tool.new.qualified_name])
+  end
+
   it 'accepts empty results and serializes them through the ordinary tool result path' do
     content, attachments = RubyLLM::Tool.split_result(described_class.new)
 

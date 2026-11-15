@@ -135,7 +135,7 @@ RSpec.describe RubyLLM::Providers::DeepSeek::Responses do
     include_context 'with application tool search'
 
     it 'answers a replayed client search call with the definitions it loaded' do
-      tools = { find_tools: finder, lookup_order: RubyLLM::Tool::Deferred.new(target) }
+      tools = { tool_search: finder, lookup_order: RubyLLM::Tool::Deferred.new(target) }
       messages = [pending_search_message(raw: [client_search_item]), search_result_message]
 
       input = protocol.send(:render_payload, messages, tools:, temperature: nil, model:)[:input]

@@ -7,7 +7,7 @@ RSpec.describe RubyLLM::Protocols::Anthropic::Chat do
   include_context 'with application tool search'
 
   let(:protocol) { RubyLLM::Protocols::Anthropic.allocate }
-  let(:tools) { { find_tools: finder, lookup_order: RubyLLM::Tool::Deferred.new(target) } }
+  let(:tools) { { tool_search: finder, lookup_order: RubyLLM::Tool::Deferred.new(target) } }
   let(:model) { RubyLLM.models.find(model_for(:anthropic), provider: :anthropic) }
   let(:reference) { [{ type: 'tool_reference', tool_name: 'lookup_order' }] }
 
@@ -25,7 +25,7 @@ RSpec.describe RubyLLM::Protocols::Anthropic::Chat do
 
   it 'declares the search tool as an eager function beside the deferred tools, without the hosted search' do
     expect(request[:tools]).to eq([
-                                    { name: 'find_tools', description: 'Finds tools for a task',
+                                    { name: 'tool_search', description: 'Finds tools for a task',
                                       input_schema: finder.parameters_schema },
                                     { name: 'lookup_order', description: 'Looks up an order',
                                       input_schema: target.parameters_schema, defer_loading: true }
@@ -33,7 +33,7 @@ RSpec.describe RubyLLM::Protocols::Anthropic::Chat do
   end
 
   it 'adds the hosted search when the request defers tools without a search tool of its own' do
-    declared = request(registered: tools.except(:find_tools))[:tools]
+    declared = request(registered: tools.except(:tool_search))[:tools]
 
     expect(declared.last).to eq(RubyLLM::Protocols::Anthropic::Tools::NATIVE_TOOL_SEARCH)
   end
@@ -98,10 +98,10 @@ RSpec.describe RubyLLM::Protocols::Anthropic::Chat do
   end
 
   it 'changes nothing without a deferred tool' do
-    registered = { find_tools: finder, lookup_order: target }
+    registered = { tool_search: finder, lookup_order: target }
     payload = request([pending_search_message, search_result_message], registered:)
 
-    expect(payload[:tools].map { |tool| tool[:name] }).to eq(%w[find_tools lookup_order])
+    expect(payload[:tools].map { |tool| tool[:name] }).to eq(%w[tool_search lookup_order])
     expect(result_content(payload)).to eq([{ type: 'text', text: '{"loaded":["lookup_order"]}' }])
   end
 
@@ -109,7 +109,7 @@ RSpec.describe RubyLLM::Protocols::Anthropic::Chat do
     raw = [
       { 'type' => 'server_tool_use', 'id' => 'hosted', 'name' => 'tool_search_tool_bm25', 'input' => {} },
       { 'type' => 'tool_search_tool_result', 'tool_use_id' => 'hosted', 'content' => [] },
-      { 'type' => 'tool_use', 'id' => 'search_1', 'name' => 'find_tools', 'input' => { 'query' => 'orders' } }
+      { 'type' => 'tool_use', 'id' => 'search_1', 'name' => 'tool_search', 'input' => { 'query' => 'orders' } }
     ]
     messages = [pending_search_message(raw:), search_result_message]
     payload = request(messages)
@@ -127,7 +127,7 @@ RSpec.describe RubyLLM::Protocols::Anthropic::Chat do
   end
 
   it 'forces the search tool by name' do
-    expect(render(tool_prefs: { choice: :find_tools })[:tool_choice]).to eq(type: :tool, name: :find_tools)
+    expect(render(tool_prefs: { choice: :tool_search })[:tool_choice]).to eq(type: :tool, name: :tool_search)
   end
 
   it 'renders the same payload repeatedly without changing the messages' do

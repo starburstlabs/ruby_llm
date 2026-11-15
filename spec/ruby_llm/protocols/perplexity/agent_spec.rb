@@ -200,7 +200,7 @@ RSpec.describe RubyLLM::Protocols::Perplexity::Agent do
 
     it 'replays a client search call beside its output' do
       protocol = described_class.new(chat.provider, chat.model)
-      tools = { find_tools: finder, lookup_order: RubyLLM::Tool::Deferred.new(target) }
+      tools = { tool_search: finder, lookup_order: RubyLLM::Tool::Deferred.new(target) }
       messages = [pending_search_message, search_result_message]
 
       input = protocol.send(:render_payload, messages, tools:, temperature: nil, model: chat.model)[:input]

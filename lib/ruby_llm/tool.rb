@@ -138,11 +138,13 @@ module RubyLLM
 
       # Returns the name the model calls this tool by, derived from the class
       # name: underscored, reduced to ASCII, with a trailing "_tool" removed.
-      # Override this method to choose a different name.
+      # Override this method to choose a different name for an ordinary tool.
+      # A tool declared with ::searches_tools is named +tool_search+.
       #
       #   WeatherLookup.tool_name  # => "weather_lookup"
       #
       def tool_name
+        return 'tool_search' if searches_tools?
         return @tool_name if @tool_name
 
         normalized = name.to_s.dup.force_encoding('UTF-8').unicode_normalize(:nfkd)
@@ -341,7 +343,10 @@ module RubyLLM
       # or RubyLLM's own. #execute returns a ToolSearchResults naming the
       # deferred tools it found, and the chat loads them. A chat never
       # defers its search tool or saves its results as files, and offers
-      # it while it has deferred tools. See Chat#deferred_tools.
+      # it while it has deferred tools. Its name is always +tool_search+,
+      # and it cannot have a namespace. Registering another declared search
+      # tool replaces it. An ordinary tool named +tool_search+ cannot share
+      # the chat with it. See Chat#deferred_tools.
       #
       #   class CatalogSearch < RubyLLM::Tool
       #     description "Finds tools for a task"

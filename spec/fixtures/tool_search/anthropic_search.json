@@ -7,7 +7,7 @@
     {
       "type": "tool_use",
       "id": "search_1",
-      "name": "find_tools",
+      "name": "tool_search",
       "input": {
         "query": "orders"
       }

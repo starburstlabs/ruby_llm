@@ -132,7 +132,7 @@ module RubyLLM
                   stream: block_given?
       )
 
-      complete_request(payload, headers, usage_recorder:, progress_recorder:, &)
+      normalize_completion(complete_request(payload, headers, usage_recorder:, progress_recorder:, &), tools:)
     end
 
     def complete_request(payload, headers, usage_recorder: nil, **) # :nodoc:

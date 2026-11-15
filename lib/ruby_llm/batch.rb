@@ -305,8 +305,8 @@ module RubyLLM
 
       results.each do |index, result, failure_status, billed|
         result = Chat::ToolCallIds.new(namespace: [@provider.slug, id, index]).assign(result) if result.is_a?(Message)
-        slots[index] = result
-        deliver(index, result, failure_status)
+        delivered = deliver(index, result, failure_status)
+        slots[index] = result.is_a?(Message) ? delivered : result
         deliver_failed_usage(index, **billed) if billed
       end
 
@@ -367,14 +367,17 @@ module RubyLLM
       chat = chats&.[](index)
       entry = attach_batch_usage(message, operation: :chat, model: chat&.model, category: :text_tokens,
                                           owner: chat&.owner)
-      return if settled?(index, chat) || (chat && already_in_chat?(chat, message))
+      existing = delivered_completion(chat, message)
+      return existing if existing
+      return message if settled?(index, chat)
 
       delivered = exclusively(index) do
         @delivered[index] = true
         report_batch_usage(entry, chat:) if entry
-        chat&.add_completion(message, record_usage: true)
+        message = chat.add_completion(message, record_usage: true) if chat
       end
       delivered ? @delivered[index] = true : @deferred = true
+      message
     end
 
     # A slot RubyLLM could not parse still cost what the provider reported.
@@ -457,17 +460,20 @@ module RubyLLM
     # A plain answer is the chat's last non-system message once it arrives. A tool-call
     # answer is not: running its tools adds messages after it, so we match on its
     # tool-call ids instead.
-    def already_in_chat?(chat, message)
-      return !self.class.awaiting_response?(chat) unless message.tool_call?
+    def delivered_completion(chat, message)
+      return unless chat
+      return self.class.awaiting_response?(chat) ? nil : message unless message.tool_call?
 
-      tool_calls_delivered?(chat, message)
+      delivered_tool_completion(chat, message)
     end
 
-    def tool_calls_delivered?(chat, message)
-      calls = chat.messages.flat_map { |existing| existing.tool_calls.to_a }
-      legacy_ids = calls.select { |call| call.provider_call_id == call.id }.map(&:id)
-      calls.map(&:id).intersect?(message.tool_calls.keys) ||
-        legacy_ids.intersect?(message.tool_calls.map(&:provider_call_id))
+    def delivered_tool_completion(chat, message)
+      chat.messages.find do |existing|
+        calls = existing.tool_calls
+        legacy_ids = calls.select { |call| call.provider_call_id == call.id }.map(&:id)
+        calls.keys.intersect?(message.tool_calls.keys) ||
+          legacy_ids.intersect?(message.tool_calls.map(&:provider_call_id))
+      end
     end
 
     module Helpers # :nodoc:

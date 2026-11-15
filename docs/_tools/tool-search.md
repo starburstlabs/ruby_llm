@@ -167,7 +167,9 @@ chat.with_tools(CatalogSearch, *Catalog.tools, defer: true)
 chat.ask "Refund order 42"
 ```
 
-`CatalogSearch` is now the chat's search tool, on every provider. It is never deferred, even inside `defer: true`, and the chat offers it while it has deferred tools. `ToolSearchResults.new` takes Tool classes, Tool instances, or the names the chat registers tools under (`:crm_customer_lookup` for a namespaced one), and the chat loads the deferred tools it names. A name that is not one of the chat's deferred tools loads nothing. Return a String instead when nothing matched and the model should hear why.
+`searches_tools` makes `CatalogSearch` the chat's search tool, on every provider. The model calls it `tool_search`, whatever the Ruby class is named. A declared search tool cannot have a namespace or override that name. Naming an ordinary tool `tool_search` does not make it a search tool.
+
+The search is never deferred, even inside `defer: true`, and the chat offers it while it has deferred tools. `ToolSearchResults.new` takes Tool classes, Tool instances, or the names the chat registers tools under (`:crm_customer_lookup` for a namespaced one), and the chat loads the deferred tools it names. A name that is not one of the chat's deferred tools loads nothing. Return a String instead when nothing matched and the model should hear why.
 
 Claude and GPT load the tools your search found the way they load the ones their own search finds, so the tool list stays the same across loads and a prompt cache keeps hitting. Every other provider gets the definitions appended to the next request, as with `tool_search`. The search and its result are an ordinary tool call in `messages`, so a persisted chat replays them on any provider, and what the search loaded stays loaded when the chat moves to another provider.
 
@@ -181,7 +183,9 @@ class SupportAgent < RubyLLM::Agent
 end
 ```
 
-Register one search tool per chat; a second raises `ArgumentError`. An MCP server's tool cannot declare `searches_tools`, so a search that runs on a server is a Tool of your own that calls it.
+Registering another tool declared with `searches_tools` replaces the chat's search implementation. It keeps the `tool_search` identity, so earlier search results still load their tools. An ordinary tool named `tool_search` cannot be registered in the same chat as a declared search tool; either registration order raises `ArgumentError`.
+
+An MCP server's tool cannot declare `searches_tools`, so a search that runs on a server is a Tool of your own that calls it.
 
 ## Provider Support
 

@@ -77,7 +77,6 @@ RSpec.describe RubyLLM::Providers::Bedrock::Anthropic do
       search = Class.new(RubyLLM::Tool) do
         description 'Finds tools for a task'
         searches_tools
-        def self.tool_name = 'find_tools'
         def execute(query:) = RubyLLM::ToolSearchResults.new(query)
       end
       body = nil
@@ -86,7 +85,7 @@ RSpec.describe RubyLLM::Providers::Bedrock::Anthropic do
       chat.with_tools(search).with_tools(BedrockAnthropicWeather, defer: true).ask('Weather in Berlin?')
 
       expect(body['tools'].map { |tool| tool.slice('name', 'defer_loading') })
-        .to eq([{ 'name' => 'bedrock_anthropic_weather', 'defer_loading' => true }, { 'name' => 'find_tools' }])
+        .to eq([{ 'name' => 'bedrock_anthropic_weather', 'defer_loading' => true }, { 'name' => 'tool_search' }])
       expect(body['anthropic_beta']).to include('tool-search-tool-2025-10-19')
     end
 

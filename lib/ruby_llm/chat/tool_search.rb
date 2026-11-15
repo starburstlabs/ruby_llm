@@ -50,10 +50,14 @@ module RubyLLM
       end
 
       def check_tool_search(name, tool)
-        return unless tool.searches_tools?
+        if tool.searches_tools? && (tool.name.to_s != 'tool_search' || !tool.namespace.nil?)
+          raise ArgumentError, 'A tool declared with searches_tools must be named tool_search without a namespace'
+        end
 
-        other = @tools.each_key.find { |key| key != name && @tools[key].searches_tools? }
-        raise ArgumentError, "#{other} and #{name} both search tools. Register one" if other
+        existing = @tools[name]
+        return unless existing && existing.searches_tools? != tool.searches_tools?
+
+        raise ArgumentError, 'The tool_search name cannot be shared by a search tool and an ordinary tool'
       end
 
       def deferred_registration?(tool, defer)
