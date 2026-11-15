@@ -38,16 +38,22 @@ RSpec.describe RubyLLM::ActiveRecord::FileStore do
   it 'keeps the digest of an IO it streams, wherever the IO stands' do
     png = File.binread(image_path)
     reader, writer = IO.pipe.each(&:binmode)
-    writer.write(png)
-    writer.close
+    writing = Thread.new do
+      writer.write(png)
+    ensure
+      writer.close
+    end
 
     store.write('pipe.png', reader)
+    writing.value
     File.open(image_path, 'rb') { |io| store.write('file', ChunkedReader.new(io)) }
 
     expect(store.list.map(&:digest)).to eq([Digest::SHA256.hexdigest(png)] * 2)
     expect(store.list.map(&:content_type)).to eq(['image/png'] * 2)
   ensure
+    writing&.kill
     reader&.close
+    writing&.join
   end
 
   it 'uploads an IO at its start to Active Storage as it is' do
