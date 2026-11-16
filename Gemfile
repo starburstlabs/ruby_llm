@@ -36,6 +36,7 @@ group :development do # rubocop:disable Metrics/BlockLength
   gem 'rails'
   gem 'rake', '>= 13.0'
   gem 'rdoc', '< 9', platform: 'jruby'
+  gem 'regexp_parser', '= 2.13.1'
   gem 'reline'
   gem 'rspec', '~> 3.12'
   gem 'rubocop', '>= 1.0'
