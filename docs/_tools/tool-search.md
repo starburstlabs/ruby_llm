@@ -171,7 +171,7 @@ chat.ask "Refund order 42"
 
 The search is never deferred, even inside `defer: true`, and the chat offers it while it has deferred tools. `ToolSearchResults.new` takes Tool classes, Tool instances, or the names the chat registers tools under (`:crm_customer_lookup` for a namespaced one), and the chat loads the deferred tools it names. A name that is not one of the chat's deferred tools loads nothing. Return a String instead when nothing matched and the model should hear why.
 
-Claude and GPT load the tools your search found the way they load the ones their own search finds, so the tool list stays the same across loads and a prompt cache keeps hitting. Every other provider gets the definitions appended to the next request, as with `tool_search`. The search and its result are an ordinary tool call in `messages`, so a persisted chat replays them on any provider, and what the search loaded stays loaded when the chat moves to another provider.
+Claude and GPT load the tools your search found the way they load the ones their own search finds, so the tool list stays the same across loads and a prompt cache keeps hitting. Every other provider gets the definitions appended to the next request, as with `tool_search`. The search and its result are an ordinary tool call in `messages`, so a persisted chat replays them on any provider. What the search loaded stays loaded, on the same provider or another one, while the chat registers the search tool and the tools it loaded. When you load the chat again, such as with `Chat.find` in a later request or job, register them again as you did when you created it.
 
 Agents declare the search tool like any other:
 
@@ -189,7 +189,7 @@ An MCP server's tool cannot declare `searches_tools`, so a search that runs on a
 
 ## Provider Support
 
-RubyLLM uses the provider's own tool search wherever it speaks Anthropic's Messages API or OpenAI's Responses API, including Claude on Bedrock and Vertex AI and GPT on Azure. It does not check the model first: a model without tool search answers with the provider's error. Check the provider's documentation for the models that support it. xAI is the exception: it speaks the Responses API, but limits its tool search to alpha accounts, so xAI chats get RubyLLM's own search.
+Without a search tool of your own, RubyLLM uses the provider's own tool search wherever it speaks Anthropic's Messages API or OpenAI's Responses API, including Claude on Bedrock and Vertex AI and GPT on Azure. It does not check the model first: a model without tool search answers with the provider's error. Check the provider's documentation for the models that support it. xAI is the exception: it speaks the Responses API, but limits its tool search to alpha accounts, so xAI chats get RubyLLM's own search.
 
 Every other provider and protocol, such as Gemini, xAI, Bedrock's Converse API (which Claude uses only with `protocol: :converse`), and OpenAI's Chat Completions API, gets a `tool_search` tool from RubyLLM instead. Its description lists the deferred tools by name, and the model calls it with a few words, or with `select:` and tool names:
 
@@ -202,7 +202,7 @@ chat.tools.keys  # => [:current_time, :search_issues, ..., :tool_search]
 
 The tools it finds are sent with every request after that, after the tools that are not deferred, in the order the conversation first loaded or called them. A deferred tool the conversation called stays loaded too. Each request repeats the one before it and adds to its end, so a prompt cache that covers the tools keeps hitting until the model loads another one. The search and its result are an ordinary tool call in `messages`, so a persisted chat keeps what it loaded.
 
-When a chat switches to another model of the same provider, the tools the earlier model found stay found. Switching to another provider starts over: a model with tool search searches again with the provider's search, and one without it loads tools with `tool_search`.
+When a chat switches to another model of the same provider, the tools the earlier model found stay found. Switching to another provider starts over: a model with tool search searches again with the provider's search, and one without it loads tools with `tool_search`. Tools that a search tool of your own loaded follow the rules in [Searching With Your Own Tool](#searching-with-your-own-tool).
 
 ## Next Steps
 
